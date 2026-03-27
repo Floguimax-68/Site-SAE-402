@@ -1,0 +1,46 @@
+html,
+body {
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	height: 100%;
+}
+
+main {
+	width: 100vw;
+	height: 100dvh;
+}
+
+.canvas-stack {
+	position: relative;
+	width: 100vw;
+	height: 100dvh;
+}
+
+#canva-background {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100vw;
+	height: 100dvh;
+}
+
+#canva-timer {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100vw;
+	height: 100dvh;
+	background: transparent;
+	pointer-events: none;
+}
+
+#canva-pommes {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100vw;
+	height: 100dvh;
+	background: transparent;
+	pointer-events: auto;
+}
