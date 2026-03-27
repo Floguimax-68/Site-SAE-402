@@ -169,14 +169,20 @@ if (pommesCanvas instanceof HTMLCanvasElement) {
 	};
 
 	const removeTouchedBalls = () => {
+		const hitboxPadding = 50;
+		const touchRadius = 40;
 		for (let i = balls.length - 1; i >= 0; i = i - 1) {
 			const ball = balls[i];
-			const left = ball.px - ball.width / 2;
-			const right = ball.px + ball.width / 2;
-			const top = ball.py - ball.height / 2;
-			const bottom = ball.py + ball.height / 2;
+			const left = ball.px - ball.width / 2 - hitboxPadding;
+			const right = ball.px + ball.width / 2 + hitboxPadding;
+			const top = ball.py - ball.height / 2 - hitboxPadding;
+			const bottom = ball.py + ball.height / 2 + hitboxPadding;
 
-			if (pxSouris >= left && pxSouris <= right && pySouris >= top && pySouris <= bottom) {
+			const distX = pxSouris - ball.px;
+			const distY = pySouris - ball.py;
+			const distance = Math.sqrt(distX * distX + distY * distY);
+
+			if ((pxSouris >= left && pxSouris <= right && pySouris >= top && pySouris <= bottom) || distance <= touchRadius) {
 				balls.splice(i, 1);
 			}
 		}
