@@ -19,6 +19,10 @@ if (pommesCanvas instanceof HTMLCanvasElement) {
 	let nextBurstDelayMs = 800;
 	let pxSouris = -1000;
 	let pySouris = -1000;
+	let showTouchZone = false;
+	let touchZoneX = -1000;
+	let touchZoneY = -1000;
+	const touchZoneRadius = 9;
 
 	const randomRange = (min, max) => min + Math.random() * (max - min);
 
@@ -77,6 +81,16 @@ if (pommesCanvas instanceof HTMLCanvasElement) {
 				ctx.fillStyle = "#e32626";
 				ctx.fillRect(drawX, drawY, ball.width, ball.height);
 			}
+		}
+
+		if (showTouchZone) {
+			ctx.save();
+			ctx.strokeStyle = "#00cc00";
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.arc(touchZoneX, touchZoneY, touchZoneRadius, 0, Math.PI * 2);
+			ctx.stroke();
+			ctx.restore();
 		}
 	};
 
@@ -168,16 +182,28 @@ if (pommesCanvas instanceof HTMLCanvasElement) {
 		drawWorld();
 	};
 
-	const removeTouchedBalls = () => {
+	const removeTouchedBalls = (contactRadius = 0) => {
 		for (let i = balls.length - 1; i >= 0; i = i - 1) {
 			const ball = balls[i];
 			const left = ball.px - ball.width / 2;
 			const right = ball.px + ball.width / 2;
 			const top = ball.py - ball.height / 2;
 			const bottom = ball.py + ball.height / 2;
+			const insideRect = pxSouris >= left && pxSouris <= right && pySouris >= top && pySouris <= bottom;
 
-			if (pxSouris >= left && pxSouris <= right && pySouris >= top && pySouris <= bottom) {
+			if (insideRect) {
 				balls.splice(i, 1);
+				continue;
+			}
+
+			if (contactRadius > 0) {
+				const nearestX = Math.max(left, Math.min(pxSouris, right));
+				const nearestY = Math.max(top, Math.min(pySouris, bottom));
+				const dx = pxSouris - nearestX;
+				const dy = pySouris - nearestY;
+				if (dx * dx + dy * dy <= contactRadius * contactRadius) {
+					balls.splice(i, 1);
+				}
 			}
 		}
 	};
@@ -195,13 +221,45 @@ if (pommesCanvas instanceof HTMLCanvasElement) {
 		const rect = pommesCanvas.getBoundingClientRect();
 		pxSouris = event.clientX - rect.left;
 		pySouris = event.clientY - rect.top;
+		showTouchZone = false;
 		removeTouchedBalls();
+	});
+	pommesCanvas.addEventListener("pointerdown", (event) => {
+		if (event.pointerType !== "touch") {
+			return;
+		}
+		const rect = pommesCanvas.getBoundingClientRect();
+		touchZoneX = event.clientX - rect.left;
+		touchZoneY = event.clientY - rect.top;
+		pxSouris = touchZoneX;
+		pySouris = touchZoneY;
+		showTouchZone = true;
+		removeTouchedBalls(touchZoneRadius);
 	});
 	pommesCanvas.addEventListener("pointermove", (event) => {
 		const rect = pommesCanvas.getBoundingClientRect();
 		pxSouris = event.clientX - rect.left;
 		pySouris = event.clientY - rect.top;
+
+		if (event.pointerType === "touch") {
+			touchZoneX = pxSouris;
+			touchZoneY = pySouris;
+			showTouchZone = true;
+			removeTouchedBalls(touchZoneRadius);
+			return;
+		}
+
+		showTouchZone = false;
 		removeTouchedBalls();
+	});
+	pommesCanvas.addEventListener("pointerup", () => {
+		showTouchZone = false;
+	});
+	pommesCanvas.addEventListener("pointercancel", () => {
+		showTouchZone = false;
+	});
+	pommesCanvas.addEventListener("pointerleave", () => {
+		showTouchZone = false;
 	});
 	document.addEventListener("touchmove", (event) => {
 		if (event.target === pommesCanvas) {
