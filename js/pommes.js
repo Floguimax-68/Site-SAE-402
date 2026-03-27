@@ -197,20 +197,17 @@ if (pommesCanvas instanceof HTMLCanvasElement) {
 		pySouris = event.clientY - rect.top;
 		removeTouchedBalls();
 	});
-	pommesCanvas.addEventListener("touchmove", (event) => {
+	pommesCanvas.addEventListener("pointermove", (event) => {
 		const rect = pommesCanvas.getBoundingClientRect();
-		const touch = event.touches[0];
-		pxSouris = touch.clientX - rect.left;
-		pySouris = touch.clientY - rect.top;
+		pxSouris = event.clientX - rect.left;
+		pySouris = event.clientY - rect.top;
 		removeTouchedBalls();
 	});
-	pommesCanvas.addEventListener("touchstart", (event) => {
-		const rect = pommesCanvas.getBoundingClientRect();
-		const touch = event.touches[0];
-		pxSouris = touch.clientX - rect.left;
-		pySouris = touch.clientY - rect.top;
-		removeTouchedBalls();
-	});
+	document.addEventListener("touchmove", (event) => {
+		if (event.target === pommesCanvas) {
+			event.preventDefault();
+		}
+	}, { passive: false });
 
 	resizePommesCanvas();
 	spawnBurst();
