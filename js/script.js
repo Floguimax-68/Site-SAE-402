@@ -3,7 +3,7 @@ const canvasFond = document.getElementById("canva-background");
 
 if (canvasFond instanceof HTMLCanvasElement) {
 	// Contexte 2D pour dessiner.
-	const contexte = canvasFond.getContext("2d");
+	const ctx = canvasFond.getContext("2d");
 	// Image de fond du jeu.
 	const imageFond = new Image();
 	imageFond.src = "img/Fond-canva-fruit-ninja-pommes.jpg";
@@ -11,7 +11,7 @@ if (canvasFond instanceof HTMLCanvasElement) {
 	// Dessine l'image en mode plein ecran sans deformation.
 	const dessinerFondPleinEcran = () => {
 		// Si le contexte ou l'image ne sont pas prets, on sort.
-		if (!contexte || !imageFond.complete || imageFond.naturalWidth === 0) {
+		if (!ctx || !imageFond.complete || imageFond.naturalWidth === 0) {
 			return;
 		}
 
@@ -44,8 +44,8 @@ if (canvasFond instanceof HTMLCanvasElement) {
 		}
 
 		// Nettoie puis dessine le fond.
-		contexte.clearRect(0, 0, largeurVue, hauteurVue);
-		contexte.drawImage(imageFond, decalageX, decalageY, largeurDessin, hauteurDessin);
+		ctx.clearRect(0, 0, largeurVue, hauteurVue);
+		ctx.drawImage(imageFond, decalageX, decalageY, largeurDessin, hauteurDessin);
 	};
 
 	// Adapte le canvas a la taille de l'ecran.
@@ -64,8 +64,8 @@ if (canvasFond instanceof HTMLCanvasElement) {
 		canvasFond.style.height = hauteurVue + "px";
 
 		// Applique le ratio pour garder un dessin net.
-		if (contexte) {
-			contexte.setTransform(ratioPixels, 0, 0, ratioPixels, 0, 0);
+		if (ctx) {
+			ctx.setTransform(ratioPixels, 0, 0, ratioPixels, 0, 0);
 		}
 
 		// Redessine le fond apres resize.

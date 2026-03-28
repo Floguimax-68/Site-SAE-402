@@ -1,126 +1,126 @@
 // Canvas place au-dessus du fond pour afficher le chrono.
-const timerCanvas = document.getElementById("canva-timer");
+const canvasMinuteur = document.getElementById("canva-timer");
 
-if (timerCanvas instanceof HTMLCanvasElement) {
-	// Contexte 2D du timer.
-	const ctx = timerCanvas.getContext("2d");
+if (canvasMinuteur instanceof HTMLCanvasElement) {
+	// Contexte 2D du minuteur.
+	const ctx = canvasMinuteur.getContext("2d");
 	// Image de la pancarte du chrono.
-	const chronoPanelImage = new Image();
-	chronoPanelImage.src = "img/pancarte-canva-chrono.png";
+	const imagePancarte = new Image();
+	imagePancarte.src = "img/pancarte-canva-chrono.png";
 	// Temps de depart en secondes.
-	let t = 60;
+	let tempsRestant = 60;
 	// Reference de l'interval pour pouvoir l'arreter.
-	let intervalId = null;
+	let identifiantIntervalle = null;
 
 	// Dessine la pancarte et la valeur du temps.
-	const renderTimer = () => {
+	const afficherMinuteur = () => {
 		// Si pas de contexte, on ne dessine rien.
 		if (!ctx) {
 			return;
 		}
 
 		// Taille actuelle du canvas visible.
-		const viewportWidth = timerCanvas.clientWidth;
-		const viewportHeight = timerCanvas.clientHeight;
+		const largeurVue = canvasMinuteur.clientWidth;
+		const hauteurVue = canvasMinuteur.clientHeight;
 		// Position en haut.
-		const topOffset = 0;
+		const decalageHaut = 0;
 		// Texte du chrono.
-		const label = t + "s";
+		const texteChrono = tempsRestant + "s";
 		// Largeur de la pancarte avec min/max.
-		const badgeWidth = Math.max(165, Math.min(viewportWidth * 0.31, 310));
+		const largeurPancarte = Math.max(165, Math.min(largeurVue * 0.31, 310));
 		// Ratio de la pancarte pour garder sa forme.
-		const panelRatio =
-			chronoPanelImage.complete && chronoPanelImage.naturalWidth > 0
-				? chronoPanelImage.naturalWidth / chronoPanelImage.naturalHeight
+		const ratioPancarte =
+			imagePancarte.complete && imagePancarte.naturalWidth > 0
+				? imagePancarte.naturalWidth / imagePancarte.naturalHeight
 				: 1.75;
 		// Calcul de la hauteur et position de la pancarte.
-		const badgeHeight = badgeWidth / panelRatio;
-		const badgeX = (viewportWidth - badgeWidth) / 2;
-		const badgeY = topOffset;
+		const hauteurPancarte = largeurPancarte / ratioPancarte;
+		const positionX = (largeurVue - largeurPancarte) / 2;
+		const positionY = decalageHaut;
 
 		// Zone interne ou on met le texte.
-		const textBoxX = badgeX + badgeWidth * 0.16;
-		const textBoxY = badgeY + badgeHeight * 0.48;
-		const textBoxWidth = badgeWidth * 0.68;
-		const textBoxHeight = badgeHeight * 0.36;
+		const zoneTexteX = positionX + largeurPancarte * 0.16;
+		const zoneTexteY = positionY + hauteurPancarte * 0.48;
+		const largeurZoneTexte = largeurPancarte * 0.68;
+		const hauteurZoneTexte = hauteurPancarte * 0.36;
 		// Taille initiale de police.
-		let fontSize = Math.max(18, Math.round(textBoxHeight * 0.7));
+		let taillePolice = Math.max(18, Math.round(hauteurZoneTexte * 0.7));
 
 		// Efface l'ancien rendu.
-		ctx.clearRect(0, 0, viewportWidth, viewportHeight);
+		ctx.clearRect(0, 0, largeurVue, hauteurVue);
 
 		// Dessine la pancarte si l'image est prete.
-		if (chronoPanelImage.complete && chronoPanelImage.naturalWidth > 0) {
-			ctx.drawImage(chronoPanelImage, badgeX, badgeY, badgeWidth, badgeHeight);
+		if (imagePancarte.complete && imagePancarte.naturalWidth > 0) {
+			ctx.drawImage(imagePancarte, positionX, positionY, largeurPancarte, hauteurPancarte);
 		}
 
 		// Definit la police du texte.
-		ctx.font = "700 " + fontSize + "px 'Trebuchet MS', 'Segoe UI', sans-serif";
+		ctx.font = "700 " + taillePolice + "px 'Trebuchet MS', 'Segoe UI', sans-serif";
 		// Reduit la police si le texte depasse.
-		while (fontSize > 16 && ctx.measureText(label).width > textBoxWidth) {
-			fontSize = fontSize - 1;
-			ctx.font = "700 " + fontSize + "px 'Trebuchet MS', 'Segoe UI', sans-serif";
+		while (taillePolice > 16 && ctx.measureText(texteChrono).width > largeurZoneTexte) {
+			taillePolice = taillePolice - 1;
+			ctx.font = "700 " + taillePolice + "px 'Trebuchet MS', 'Segoe UI', sans-serif";
 		}
 
 		// Style du texte puis dessin centre.
 		ctx.fillStyle = "#ffffff";
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
-		ctx.fillText(label, textBoxX + textBoxWidth / 2, textBoxY + textBoxHeight / 2);
+		ctx.fillText(texteChrono, zoneTexteX + largeurZoneTexte / 2, zoneTexteY + hauteurZoneTexte / 2);
 	};
 
-	// Ajuste le canvas du timer a l'ecran.
-	const resizeTimerCanvas = () => {
+	// Ajuste le canvas du minuteur a l'ecran.
+	const redimensionnerCanvasMinuteur = () => {
 		// Taille de la fenetre et ratio ecran.
-		const viewportWidth = window.innerWidth;
-		const viewportHeight = window.innerHeight;
-		const dpr = window.devicePixelRatio || 1;
+		const largeurVue = window.innerWidth;
+		const hauteurVue = window.innerHeight;
+		const ratioPixels = window.devicePixelRatio || 1;
 
 		// Taille interne du canvas.
-		timerCanvas.width = Math.floor(viewportWidth * dpr);
-		timerCanvas.height = Math.floor(viewportHeight * dpr);
+		canvasMinuteur.width = Math.floor(largeurVue * ratioPixels);
+		canvasMinuteur.height = Math.floor(hauteurVue * ratioPixels);
 		// Taille visuelle du canvas.
-		timerCanvas.style.width = viewportWidth + "px";
-		timerCanvas.style.height = viewportHeight + "px";
+		canvasMinuteur.style.width = largeurVue + "px";
+		canvasMinuteur.style.height = hauteurVue + "px";
 
 		// Conserve un rendu net sur tous les ecrans.
 		if (ctx) {
-			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			ctx.setTransform(ratioPixels, 0, 0, ratioPixels, 0, 0);
 		}
 
-		// Redessine le timer apres resize.
-		renderTimer();
+		// Redessine le minuteur apres resize.
+		afficherMinuteur();
 	};
 
 	// Reagit aux changements de taille/orientation.
-	window.addEventListener("resize", resizeTimerCanvas);
-	window.addEventListener("orientationchange", resizeTimerCanvas);
+	window.addEventListener("resize", redimensionnerCanvasMinuteur);
+	window.addEventListener("orientationchange", redimensionnerCanvasMinuteur);
 	// Reagit au chargement de la pancarte.
-	chronoPanelImage.addEventListener("load", renderTimer);
+	imagePancarte.addEventListener("load", afficherMinuteur);
 	// Premier dessin.
-	resizeTimerCanvas();
+	redimensionnerCanvasMinuteur();
 
 	// Decompte: toutes les 1 seconde.
-	intervalId = setInterval(() => {
+	identifiantIntervalle = setInterval(() => {
 		// Tant qu'il reste du temps, on retire 1 seconde.
-		if (t > 0) {
-			t = t - 1;
-			renderTimer();
+		if (tempsRestant > 0) {
+			tempsRestant = tempsRestant - 1;
+			afficherMinuteur();
 		}
 
 		// A 0, on arrete et on envoie l'evenement de fin.
-		if (t === 0) {
-			clearInterval(intervalId);
-			renderTimer();
-			window.dispatchEvent(new Event("timer-ended"));
+		if (tempsRestant === 0) {
+			clearInterval(identifiantIntervalle);
+			afficherMinuteur();
+			window.dispatchEvent(new Event("minuteur-termine"));
 		}
 	}, 1000);
 
-	// Si game over, on arrete aussi le chrono.
-	window.addEventListener("game-over", () => {
-		if (intervalId !== null) {
-			clearInterval(intervalId);
-			intervalId = null;
+	// Si fin de partie, on arrete aussi le chrono.
+	window.addEventListener("fin-de-partie", () => {
+		if (identifiantIntervalle !== null) {
+			clearInterval(identifiantIntervalle);
+			identifiantIntervalle = null;
 		}
 	});
 }
