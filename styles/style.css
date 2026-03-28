@@ -44,3 +44,46 @@ main {
 	background: transparent;
 	pointer-events: auto;
 }
+
+.game-overlay {
+	position: absolute;
+	inset: 0;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 10;
+	pointer-events: auto;
+}
+
+.game-overlay.is-visible {
+	display: flex;
+}
+
+.game-overlay-card {
+	background: rgba(255, 255, 255, 0.95);
+	padding: 22px 20px;
+	border-radius: 14px;
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+	text-align: center;
+	min-width: 220px;
+}
+
+.game-overlay-card h1 {
+	margin: 0 0 14px;
+	font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+	font-size: clamp(26px, 7vw, 38px);
+	letter-spacing: 1px;
+	color: #b50000;
+}
+
+#restart-button {
+	border: none;
+	border-radius: 10px;
+	padding: 10px 16px;
+	font-size: 16px;
+	font-weight: 700;
+	cursor: pointer;
+	background: #1f8f2f;
+	color: #ffffff;
+}
