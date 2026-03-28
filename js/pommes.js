@@ -1,4 +1,4 @@
-// Canvas principal des pommes (gameplay).
+       // Canvas principal des pommes (gameplay).
 const canvasPommes = document.getElementById("canva-pommes");
 
 if (canvasPommes instanceof HTMLCanvasElement) {
@@ -35,6 +35,23 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	const rayonZoneTactile = 9;
 	// Evite de declencher fin de partie plusieurs fois.
 	let finPartieDeclenchee = false;
+	let points = 0;
+
+	const affichagePoints = document.createElement("div");
+	affichagePoints.textContent = points + " pts";
+	affichagePoints.style.position = "fixed";
+	affichagePoints.style.top = "10px";
+	affichagePoints.style.right = "10px";
+	affichagePoints.style.zIndex = "1000";
+	affichagePoints.style.fontSize = "36px";
+	affichagePoints.style.fontWeight = "700";
+	affichagePoints.style.fontFamily = "'Trebuchet MS', 'Segoe UI', sans-serif";
+	affichagePoints.style.color = "#ffffff";
+	document.body.appendChild(affichagePoints);
+
+	const mettreAJourAffichagePoints = () => {
+		affichagePoints.textContent = points + " pts";
+	};
 
 	// Nombre aleatoire entre min et max.
 	const aleatoireEntre = (min, max) => min + Math.random() * (max - min);
@@ -292,6 +309,17 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	// Detecte les pommes touchees par souris/doigt.
 	const supprimerPommesTouchees = (rayonContact = 0) => {
 		let pommePourrieTouchee = false;
+		const ajouterPoints = (typePomme) => {
+			if (typePomme === "rouge") {
+				points = points + 2;
+				mettreAJourAffichagePoints();
+			}
+
+			if (typePomme === "jaune") {
+				points = points + 10;
+				mettreAJourAffichagePoints();
+			}
+		};
 
 		for (let i = pommesActives.length - 1; i >= 0; i = i - 1) {
 			const pomme = pommesActives[i];
@@ -312,6 +340,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 				if (pomme.type === "verte") {
 					pommePourrieTouchee = true;
 				}
+				ajouterPoints(pomme.type);
 				pommesActives.splice(i, 1);
 				continue;
 			}
@@ -326,6 +355,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 					if (pomme.type === "verte") {
 						pommePourrieTouchee = true;
 					}
+					ajouterPoints(pomme.type);
 					pommesActives.splice(i, 1);
 				}
 			}
