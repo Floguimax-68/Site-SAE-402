@@ -6,7 +6,34 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 	const ctx = canvasMinuteur.getContext("2d");
 	// Image de la pancarte du chrono.
 	const imagePancarte = new Image();
-	imagePancarte.src = "img/pancarte-canva-chrono.png";
+	imagePancarte.src = "img/pancarte-canva-chrono.webp";
+	const sonTick = new Audio("img/sfx/Time-tick.wav");
+	const sonTock = new Audio("img/sfx/Time-tock.wav");
+	const sonBeep = new Audio("img/sfx/time-beep.wav");
+	const sonTimeUp = new Audio("img/sfx/time-up.wav");
+	const sonsChrono = [sonTick, sonTock, sonBeep, sonTimeUp];
+	let sonsChronoInitialises = false;
+	let prochainTicTac = "tick";
+
+	const jouerSon = (audio) => {
+		audio.currentTime = 0;
+		audio.play().catch(() => {
+			// Ignore les blocages navigateur si pas encore d'interaction.
+		});
+	};
+
+	const initialiserSonsChrono = () => {
+		if (sonsChronoInitialises) {
+			return;
+		}
+
+		for (let i = 0; i < sonsChrono.length; i = i + 1) {
+			sonsChrono[i].preload = "auto";
+			sonsChrono[i].load();
+		}
+
+		sonsChronoInitialises = true;
+	};
 	// Temps de depart en secondes.
 	let tempsRestant = 60;
 	// Reference de l'interval pour pouvoir l'arreter.
@@ -99,18 +126,35 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 	imagePancarte.addEventListener("load", afficherMinuteur);
 	// Premier dessin.
 	redimensionnerCanvasMinuteur();
+	window.addEventListener("pointerdown", initialiserSonsChrono, { once: true });
 
 	// Decompte: toutes les 1 seconde.
 	identifiantIntervalle = setInterval(() => {
 		// Tant qu'il reste du temps, on retire 1 seconde.
 		if (tempsRestant > 0) {
 			tempsRestant = tempsRestant - 1;
+
+			if (tempsRestant <= 10 && tempsRestant > 3) {
+				if (prochainTicTac === "tick") {
+					jouerSon(sonTick);
+					prochainTicTac = "tock";
+				} else {
+					jouerSon(sonTock);
+					prochainTicTac = "tick";
+				}
+			}
+
+			if (tempsRestant <= 3 && tempsRestant > 0) {
+				jouerSon(sonBeep);
+			}
+
 			afficherMinuteur();
 		}
 
 		// A 0, on arrete et on envoie l'evenement de fin.
 		if (tempsRestant === 0) {
 			clearInterval(identifiantIntervalle);
+			jouerSon(sonTimeUp);
 			afficherMinuteur();
 			window.dispatchEvent(new Event("minuteur-termine"));
 		}

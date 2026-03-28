@@ -6,7 +6,7 @@ if (canvasFond instanceof HTMLCanvasElement) {
 	const ctx = canvasFond.getContext("2d");
 	// Image de fond du jeu.
 	const imageFond = new Image();
-	imageFond.src = "img/Fond-canva-fruit-ninja-pommes.jpg";
+	imageFond.src = "img/Fond-canva-fruit-ninja-pommes.webp";
 
 	// Dessine l'image en mode plein ecran sans deformation.
 	const dessinerFondPleinEcran = () => {

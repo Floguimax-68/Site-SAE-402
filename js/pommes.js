@@ -14,9 +14,39 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		rouge: new Image()
 	};
 	// Chemins des images.
-	imagesPommes.jaune.src = "img/apple_golden_60x60px.png";
-	imagesPommes.verte.src = "img/apple_rotten_60x60px.png";
-	imagesPommes.rouge.src = "img/apple_regular_60x60px.png";
+	imagesPommes.jaune.src = "img/apple_golden_60x60px.webp";
+	imagesPommes.verte.src = "img/apple_rotten_60x60px.webp";
+	imagesPommes.rouge.src = "img/apple_regular_60x60px.webp";
+
+	const sonPommeClassique = new Audio("img/sfx/Impact-Plum.wav");
+	const sonComboDoree = new Audio("img/sfx/combo-1.wav");
+	const sonPommePourrie = new Audio("img/sfx/freesound_community-small-explosion-106769.mp3");
+	const sonMort = new Audio("img/sfx/freesound_community-videogame-death-sound-43894.mp3");
+	const sonImpact = new Audio("img/sfx/Impact.wav");
+	const sonThrowFruit = new Audio("img/sfx/Throw-fruit.wav");
+	sonThrowFruit.volume = 0.45;
+	const sonsJeu = [sonPommeClassique, sonComboDoree, sonPommePourrie, sonMort, sonImpact, sonThrowFruit];
+	let sonsInitialises = false;
+
+	const initialiserSons = () => {
+		if (sonsInitialises) {
+			return;
+		}
+
+		for (let i = 0; i < sonsJeu.length; i = i + 1) {
+			sonsJeu[i].preload = "auto";
+			sonsJeu[i].load();
+		}
+
+		sonsInitialises = true;
+	};
+
+	const jouerSon = (audio) => {
+		audio.currentTime = 0;
+		audio.play().catch(() => {
+			// Ignore les blocages navigateur si aucun geste utilisateur.
+		});
+	};
 
 	// Variables principales de la boucle du jeu.
 	let identifiantAnimation = null;
@@ -163,6 +193,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			hauteur: taillePomme,
 			type
 		});
+		jouerSon(sonThrowFruit);
 	};
 
 	// Fait apparaitre 1 ou 2 pommes d'un coup.
@@ -194,18 +225,21 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 				// Mur gauche.
 				pomme.posX = demiLargeur;
 				pomme.vitesseX = -pomme.vitesseX;
+				jouerSon(sonImpact);
 			}
 
 			if (pomme.posX + demiLargeur >= largeurMonde) {
 				// Mur droit.
 				pomme.posX = largeurMonde - demiLargeur;
 				pomme.vitesseX = -pomme.vitesseX;
+				jouerSon(sonImpact);
 			}
 
 			if (pomme.posY - demiHauteur <= 0) {
 				// Mur haut.
 				pomme.posY = demiHauteur;
 				pomme.vitesseY = -pomme.vitesseY;
+				jouerSon(sonImpact);
 			}
 
 			if (pomme.posY - demiHauteur > hauteurMonde + 160 && pomme.vitesseY > 0) {
@@ -245,6 +279,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 					pommeA.vitesseY = pommeB.vitesseY;
 					pommeB.vitesseX = ancienneVitesseX;
 					pommeB.vitesseY = ancienneVitesseY;
+					jouerSon(sonImpact);
 				}
 			}
 		}
@@ -297,6 +332,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		}
 
 		finPartieDeclenchee = true;
+		jouerSon(sonMort);
 		arreterJeu();
 		window.dispatchEvent(new Event("fin-de-partie"));
 
@@ -313,11 +349,14 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			if (typePomme === "rouge") {
 				points = points + 2;
 				mettreAJourAffichagePoints();
+				jouerSon(sonPommeClassique);
 			}
 
 			if (typePomme === "jaune") {
 				points = points + 10;
 				mettreAJourAffichagePoints();
+				jouerSon(sonPommeClassique);
+				jouerSon(sonComboDoree);
 			}
 		};
 
@@ -339,6 +378,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 				// Pomme verte = fin de partie.
 				if (pomme.type === "verte") {
 					pommePourrieTouchee = true;
+					jouerSon(sonPommePourrie);
 				}
 				ajouterPoints(pomme.type);
 				pommesActives.splice(i, 1);
@@ -354,6 +394,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 				if (ecartX * ecartX + ecartY * ecartY <= rayonContact * rayonContact) {
 					if (pomme.type === "verte") {
 						pommePourrieTouchee = true;
+						jouerSon(sonPommePourrie);
 					}
 					ajouterPoints(pomme.type);
 					pommesActives.splice(i, 1);
@@ -380,6 +421,8 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	window.addEventListener("minuteur-termine", arreterJeu);
 	// Souris: met a jour la position de coupe.
 	canvasPommes.addEventListener("mousemove", (event) => {
+		initialiserSons();
+
 		const rectangle = canvasPommes.getBoundingClientRect();
 		positionSourisX = event.clientX - rectangle.left;
 		positionSourisY = event.clientY - rectangle.top;
@@ -388,6 +431,8 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	});
 	// Debut du contact tactile.
 	canvasPommes.addEventListener("pointerdown", (event) => {
+		initialiserSons();
+
 		if (event.pointerType !== "touch") {
 			return;
 		}
@@ -401,6 +446,8 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	});
 	// Deplacement souris/doigt.
 	canvasPommes.addEventListener("pointermove", (event) => {
+		initialiserSons();
+
 		const rectangle = canvasPommes.getBoundingClientRect();
 		positionSourisX = event.clientX - rectangle.left;
 		positionSourisY = event.clientY - rectangle.top;
