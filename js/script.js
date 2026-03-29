@@ -1,34 +1,40 @@
-// On recupere le canvas du fond.
+// Element canvas utilise pour afficher le decor de fond.
 const canvasFond = document.getElementById("canva-background");
 
 if (canvasFond instanceof HTMLCanvasElement) {
-	// Contexte 2D pour dessiner.
+	// Contexte 2D qui permet de dessiner sur le canvas du fond.
 	const ctx = canvasFond.getContext("2d");
-	// Image de fond du jeu.
+	// Objet image qui contient le visuel de fond du jeu.
 	const imageFond = new Image();
 	imageFond.src = "img/Fond-canva-fruit-ninja-pommes.webp";
 
 	// Dessine l'image en mode plein ecran sans deformation.
-	const dessinerFondPleinEcran = () => {
+	function dessinerFondPleinEcran() {
 		// Si le contexte ou l'image ne sont pas prets, on sort.
 		if (!ctx || !imageFond.complete || imageFond.naturalWidth === 0) {
 			return;
 		}
 
-		// Taille de la fenetre.
+		// Largeur actuelle de la zone visible du navigateur.
 		const largeurVue = window.innerWidth;
+		// Hauteur actuelle de la zone visible du navigateur.
 		const hauteurVue = window.innerHeight;
-		// Taille originale de l'image.
+		// Largeur native du fichier image de fond.
 		const largeurImage = imageFond.naturalWidth;
+		// Hauteur native du fichier image de fond.
 		const hauteurImage = imageFond.naturalHeight;
-		// Ratios pour garder les proportions.
+		// Ratio largeur/hauteur de l'image source pour conserver les proportions.
 		const ratioImage = largeurImage / hauteurImage;
+		// Ratio largeur/hauteur de la fenetre pour adapter le cadrage.
 		const ratioVue = largeurVue / hauteurVue;
 
-		// Valeurs de dessin par defaut.
+		// Largeur finale de l'image dessinee dans le canvas.
 		let largeurDessin = largeurVue;
+		// Hauteur finale de l'image dessinee dans le canvas.
 		let hauteurDessin = hauteurVue;
+		// Decalage horizontal applique pour centrer le visuel.
 		let decalageX = 0;
+		// Decalage vertical applique pour centrer le visuel.
 		let decalageY = 0;
 
 		// Si l'image est plus large que la vue, on centre en X.
@@ -46,14 +52,15 @@ if (canvasFond instanceof HTMLCanvasElement) {
 		// Nettoie puis dessine le fond.
 		ctx.clearRect(0, 0, largeurVue, hauteurVue);
 		ctx.drawImage(imageFond, decalageX, decalageY, largeurDessin, hauteurDessin);
-	};
+	}
 
-	// Adapte le canvas a la taille de l'ecran.
-	const redimensionnerCanvasFond = () => {
-		// Nouvelle taille de la fenetre.
+	// Fonction qui redimensionne le canvas de fond a la taille de l'ecran.
+	function redimensionnerCanvasFond() {
+		// Largeur visible a appliquer au canvas.
 		const largeurVue = window.innerWidth;
+		// Hauteur visible a appliquer au canvas.
 		const hauteurVue = window.innerHeight;
-		// Ratio ecran (retina, etc.).
+		// Ratio de pixels pour eviter un rendu flou sur ecrans haute densite.
 		const ratioPixels = window.devicePixelRatio || 1;
 
 		// Taille interne du canvas (en pixels reels).
@@ -70,7 +77,7 @@ if (canvasFond instanceof HTMLCanvasElement) {
 
 		// Redessine le fond apres resize.
 		dessinerFondPleinEcran();
-	};
+	}
 
 	// Redessine si la fenetre change de taille.
 	window.addEventListener("resize", redimensionnerCanvasFond);
