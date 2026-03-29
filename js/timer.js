@@ -52,6 +52,8 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 	const reductionTailleMinuteurPx = 4;
 	// Identifiant de l'intervalle pour pouvoir l'arreter proprement.
 	let identifiantIntervalle = null;
+	// Verrou pour ne demarrer le minuteur qu'une seule fois.
+	let minuteurDemarre = false;
 
 	// Dessine la pancarte et la valeur du temps.
 	function afficherMinuteur() {
@@ -175,12 +177,19 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 	});
 	// Reagit au chargement de la pancarte.
 	imagePancarte.addEventListener("load", afficherMinuteur);
-	// Premier dessin.
-	redimensionnerCanvasMinuteur();
 	window.addEventListener("pointerdown", initialiserSonsChrono, { once: true });
 
-	// Decompte: toutes les 1 seconde.
-	identifiantIntervalle = setInterval(function () {
+	// Demarre le minuteur uniquement au lancement explicite du jeu.
+	function demarrerMinuteur() {
+		if (minuteurDemarre) {
+			return;
+		}
+
+		minuteurDemarre = true;
+		redimensionnerCanvasMinuteur();
+
+		// Decompte: toutes les 1 seconde.
+		identifiantIntervalle = setInterval(function () {
 		// Tant qu'il reste du temps, on retire 1 seconde.
 		if (tempsRestant > 0) {
 			tempsRestant = tempsRestant - 1;
@@ -209,7 +218,9 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 			afficherMinuteur();
 			window.dispatchEvent(new Event("minuteur-termine"));
 		}
-	}, 1000);
+		}, 1000);
+	}
+	window.addEventListener("jeu-demarre", demarrerMinuteur);
 
 	// Si fin de partie, on arrete aussi le chrono.
 	window.addEventListener("fin-de-partie", function () {

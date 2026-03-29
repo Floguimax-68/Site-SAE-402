@@ -86,8 +86,40 @@ main {
 	color: #b50000;
 }
 
+/* Variante de couleur pour le titre de la carte de victoire. */
+.game-overlay-card-win h1 {
+	color: #1f8f2f;
+}
+
+/* Texte de score affiche dans les overlays de fin de partie/victoire. */
+.overlay-message {
+	margin: 0 0 14px;
+	font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+	font-size: clamp(16px, 3.8vw, 22px);
+	font-weight: 700;
+	color: #232323;
+}
+
+/* Liste des regles dans l'overlay de demarrage. */
+.rules-list {
+	margin: 0 0 14px;
+	padding-left: 24px;
+	text-align: left;
+	font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+	font-size: clamp(15px, 3.2vw, 20px);
+	line-height: 1.35;
+	color: #232323;
+}
+
+/* Espacement entre les points de la liste des regles. */
+.rules-list li {
+	margin-bottom: 6px;
+}
+
 /* Bouton de redemarrage du jeu. */
-#restart-button {
+#restart-button,
+#continue-button,
+#start-button {
 	border: none;
 	border-radius: 10px;
 	padding: 10px 16px;

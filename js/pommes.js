@@ -6,8 +6,20 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	const ctx = canvasPommes.getContext("2d");
 	// Element overlay affiche quand la partie est perdue.
 	const overlayFinPartie = document.getElementById("game-over-overlay");
+	// Element overlay affiche quand le joueur gagne.
+	const overlayVictoire = document.getElementById("win-overlay");
+	// Element overlay affiche les regles avant le debut de partie.
+	const overlayRegles = document.getElementById("rules-overlay");
 	// Bouton qui relance une partie apres game over.
 	const boutonRecommencer = document.getElementById("restart-button");
+	// Bouton pour continuer apres victoire (relance le jeu pour l'instant).
+	const boutonContinuer = document.getElementById("continue-button");
+	// Bouton qui lance la partie depuis l'overlay des regles.
+	const boutonDemarrer = document.getElementById("start-button");
+	// Texte dynamique qui affiche le score final dans l'overlay victoire.
+	const messageVictoire = document.getElementById("win-message");
+	// Texte dynamique qui affiche le score final dans l'overlay game over.
+	const messageFinPartie = document.getElementById("game-over-message");
 	// Dictionnaire des images associees a chaque type de pomme.
 	const imagesPommes = {
 		jaune: new Image(),
@@ -92,6 +104,10 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	// Evite de declencher fin de partie plusieurs fois.
 	// Verrou qui evite plusieurs executions de la fin de partie.
 	let finPartieDeclenchee = false;
+	// Verrou pour demarrer la boucle de jeu une seule fois.
+	let jeuDemarre = false;
+	// Score minimum a atteindre pour valider la victoire.
+	const scoreVictoire = 125;
 	// Score courant du joueur.
 	let points = 0;
 
@@ -242,8 +258,18 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 
 	// Fait apparaitre 1 ou 2 pommes d'un coup.
 	function apparaitreRafale() {
+		// Tirage pondere: 1-2 tres frequents, 3 rare, 4 tres rare.
+		const tirageRafale = Math.random() * 100;
 		// Nombre de pommes a creer pour cette vague.
-		const nombre = entierAleatoireEntre(1, 2);
+		let nombre = entierAleatoireEntre(1, 2);
+
+		if (tirageRafale >= 93 && tirageRafale < 98) {
+			nombre = 3;
+		}
+
+		if (tirageRafale >= 98) {
+			nombre = 4;
+		}
 
 		// Index de boucle pour creer le bon nombre de pommes.
 		for (let i = 0; i < nombre; i = i + 1) {
@@ -394,8 +420,8 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		dessinerMonde();
 	}
 
-	// Affiche l'overlay GAME OVER.
-	function afficherFinPartie() {
+	// Affiche l'overlay GAME OVER avec un message adapte a la cause.
+	function afficherFinPartie(causeDefaite) {
 		if (finPartieDeclenchee) {
 			return;
 		}
@@ -405,9 +431,58 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		arreterJeu();
 		window.dispatchEvent(new Event("fin-de-partie"));
 
+		if (messageFinPartie instanceof HTMLElement) {
+			if (causeDefaite === "pomme-pourrie") {
+				messageFinPartie.textContent = "Aïe, vous avez coupé une pomme pourrie.";
+			} else {
+				messageFinPartie.textContent = "Vous avez marqué moins de 125 points.";
+			}
+		}
+
 		if (overlayFinPartie instanceof HTMLElement) {
 			overlayFinPartie.classList.add("is-visible");
 		}
+	}
+
+	// Affiche l'overlay de victoire avec le score final.
+	function afficherVictoire() {
+		if (finPartieDeclenchee) {
+			return;
+		}
+
+		finPartieDeclenchee = true;
+		arreterJeu();
+		window.dispatchEvent(new Event("fin-de-partie"));
+
+		if (messageVictoire instanceof HTMLElement) {
+			messageVictoire.textContent = "Bravo, vous avez marqué " + points + " points.";
+		}
+
+		if (overlayVictoire instanceof HTMLElement) {
+			overlayVictoire.classList.add("is-visible");
+		}
+	}
+
+	// Gere la fin du minuteur: victoire si score atteint, sinon game over.
+	function gererFinMinuteur() {
+		if (points >= scoreVictoire) {
+			afficherVictoire();
+			return;
+		}
+
+		afficherFinPartie("score-insuffisant");
+	}
+
+	// Lance la boucle du jeu (pommes) une seule fois.
+	function demarrerJeuPommes() {
+		if (jeuDemarre) {
+			return;
+		}
+
+		jeuDemarre = true;
+		redimensionnerCanvasPommes();
+		apparaitreRafale();
+		identifiantAnimation = window.requestAnimationFrame(animer);
 	}
 
 	// Detecte les pommes touchees par souris/doigt.
@@ -485,7 +560,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 
 		// Fin de partie si une pomme pourrie est touchee.
 		if (pommePourrieTouchee) {
-			afficherFinPartie();
+			afficherFinPartie("pomme-pourrie");
 		}
 	}
 
@@ -499,7 +574,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		dessinerMonde();
 	});
 	// Arret si le minuteur est termine.
-	window.addEventListener("minuteur-termine", arreterJeu);
+	window.addEventListener("minuteur-termine", gererFinMinuteur);
 	// Souris: met a jour la position de coupe.
 	canvasPommes.addEventListener("mousemove", function (event) {
 		initialiserSons();
@@ -572,8 +647,25 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		});
 	}
 
-	// Initialisation du jeu.
-	redimensionnerCanvasPommes();
-	apparaitreRafale();
-	identifiantAnimation = window.requestAnimationFrame(animer);
+	// Bouton continuer: recharge la page pour relancer une partie.
+	if (boutonContinuer instanceof HTMLButtonElement) {
+		boutonContinuer.addEventListener("click", function () {
+			window.location.reload();
+		});
+	}
+
+	// Bouton GO: masque les regles puis lance le jeu.
+	if (boutonDemarrer instanceof HTMLButtonElement) {
+		boutonDemarrer.addEventListener("click", function () {
+			if (overlayRegles instanceof HTMLElement) {
+				overlayRegles.classList.remove("is-visible");
+			}
+
+			window.dispatchEvent(new Event("jeu-demarre"));
+			demarrerJeuPommes();
+		});
+	}
+
+	// Lancement possible du gameplay via evenement global.
+	window.addEventListener("jeu-demarre", demarrerJeuPommes);
 }

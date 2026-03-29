@@ -14,10 +14,31 @@
 			<canvas id="canva-timer"></canvas>
 			<canvas id="canva-pommes"></canvas>
 		</div>
+		<div id="rules-overlay" class="game-overlay is-visible">
+			<div class="game-overlay-card">
+				<h1>REGLES DU JEU</h1>
+				<ul class="rules-list">
+					<li>Ne pas couper les pommes pourries.</li>
+					<li>Faire minimum 125 points.</li>
+					<li>Pomme rouge = 2 points.</li>
+					<li>Pommes dorees = 10 points.</li>
+				</ul>
+				<p class="overlay-message">Bonne chance !</p>
+				<button id="start-button" type="button">GO !</button>
+			</div>
+		</div>
 		<div id="game-over-overlay" class="game-overlay">
 			<div class="game-overlay-card">
 				<h1>GAME OVER</h1>
+				<p id="game-over-message" class="overlay-message">Vous avez marqué 0 points.</p>
 				<button id="restart-button" type="button">Recommencer</button>
+			</div>
+		</div>
+		<div id="win-overlay" class="game-overlay">
+			<div class="game-overlay-card game-overlay-card-win">
+				<h1>VICTOIRE</h1>
+				<p id="win-message" class="overlay-message">Bravo, vous avez marqué 0 points.</p>
+				<button id="continue-button" type="button">Continuer</button>
 			</div>
 		</div>
 	</main>
