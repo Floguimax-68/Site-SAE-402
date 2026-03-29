@@ -23,12 +23,14 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	const sonPommeClassique = new Audio("img/sfx/Impact-Plum.wav");
 	// Son bonus joue pour une pomme jaune.
 	const sonComboDoree = new Audio("img/sfx/combo-1.wav");
+	sonComboDoree.volume = 0.25;
 	// Son joue quand une pomme pourrie est touchee.
 	const sonPommePourrie = new Audio("img/sfx/freesound_community-small-explosion-106769.mp3");
 	// Son de mort joue lors de la fin de partie.
 	const sonMort = new Audio("img/sfx/freesound_community-videogame-death-sound-43894.mp3");
 	// Son d'impact joue sur collision avec bords ou autres pommes.
 	const sonImpact = new Audio("img/sfx/Impact.wav");
+	sonImpact.volume = 0.25;
 	// Son joue lors de l'apparition/lancement d'une pomme.
 	const sonThrowFruit = new Audio("img/sfx/Throw-fruit.wav");
 	sonThrowFruit.volume = 0.45;
@@ -93,23 +95,13 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	// Score courant du joueur.
 	let points = 0;
 
-	// Element DOM qui affiche le score en haut a droite.
-	const affichagePoints = document.createElement("div");
-	affichagePoints.textContent = points + " pts";
-	affichagePoints.style.position = "fixed";
-	affichagePoints.style.top = "10px";
-	affichagePoints.style.right = "10px";
-	affichagePoints.style.zIndex = "1000";
-	affichagePoints.style.fontSize = "36px";
-	affichagePoints.style.fontWeight = "700";
-	affichagePoints.style.fontFamily = "'Trebuchet MS', 'Segoe UI', sans-serif";
-	affichagePoints.style.color = "#ffffff";
-	document.body.appendChild(affichagePoints);
-
-	// Fonction qui synchronise l'affichage du score avec la variable points.
+	// Fonction qui envoie le score au canvas timer pour affichage sur la pancarte.
 	function mettreAJourAffichagePoints() {
-		affichagePoints.textContent = points + " pts";
+		window.dispatchEvent(new CustomEvent("points-mis-a-jour", {
+			detail: { points: points }
+		}));
 	}
+	mettreAJourAffichagePoints();
 
 	// Nombre aleatoire entre min et max.
 	function aleatoireEntre(min, max) {
@@ -415,7 +407,6 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 
 		if (overlayFinPartie instanceof HTMLElement) {
 			overlayFinPartie.classList.add("is-visible");
-			overlayFinPartie.setAttribute("aria-hidden", "false");
 		}
 	}
 

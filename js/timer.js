@@ -46,6 +46,10 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 	}
 	// Valeur du compte a rebours en secondes.
 	let tempsRestant = 60;
+	// Score courant a afficher sur la pancarte du timer.
+	let pointsAffiches = 0;
+	// Reduction legere de la taille visuelle du timer (en px).
+	const reductionTailleMinuteurPx = 4;
 	// Identifiant de l'intervalle pour pouvoir l'arreter proprement.
 	let identifiantIntervalle = null;
 
@@ -64,8 +68,10 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 		const decalageHaut = 0;
 		// Chaine affichee (ex: 57s) au centre de la pancarte.
 		const texteChrono = tempsRestant + "s";
+		// Chaine affichee pour le score sur la partie haute de la pancarte.
+		const textePoints = pointsAffiches + " points";
 		// Largeur de rendu de la pancarte, limitee pour rester lisible.
-		const largeurPancarte = Math.max(165, Math.min(largeurVue * 0.31, 310));
+		const largeurPancarte = Math.max(165, Math.min(largeurVue * 0.31, 310)) - reductionTailleMinuteurPx;
 		// Ratio de l'image de pancarte pour conserver ses proportions.
 		const ratioPancarte =
 			imagePancarte.complete && imagePancarte.naturalWidth > 0
@@ -86,6 +92,12 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 		const largeurZoneTexte = largeurPancarte * 0.68;
 		// Hauteur disponible pour afficher le texte du chrono.
 		const hauteurZoneTexte = hauteurPancarte * 0.36;
+		// Centre horizontal utilise pour aligner chrono + points.
+		const centreTexteX = zoneTexteX + largeurZoneTexte / 2;
+		// Position verticale du score sur la partie haute de la zone.
+		const positionPointsY = zoneTexteY + hauteurZoneTexte * 0.02;
+		// Position verticale du chrono sur la partie basse de la zone.
+		const positionChronoY = zoneTexteY + hauteurZoneTexte * 0.83;
 		// Taille de police initiale, ajustee ensuite si le texte deborde.
 		let taillePolice = Math.max(18, Math.round(hauteurZoneTexte * 0.7));
 
@@ -109,7 +121,17 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 		ctx.fillStyle = "#ffffff";
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
-		ctx.fillText(texteChrono, zoneTexteX + largeurZoneTexte / 2, zoneTexteY + hauteurZoneTexte / 2);
+		ctx.fillText(texteChrono, centreTexteX, positionChronoY);
+
+		// Police plus petite pour le score au-dessus du chrono.
+		let taillePolicePoints = Math.max(12, Math.round(taillePolice * 0.48));
+		ctx.font = "700 " + taillePolicePoints + "px 'Trebuchet MS', 'Segoe UI', sans-serif";
+		while (taillePolicePoints > 10 && ctx.measureText(textePoints).width > largeurZoneTexte) {
+			taillePolicePoints = taillePolicePoints - 1;
+			ctx.font = "700 " + taillePolicePoints + "px 'Trebuchet MS', 'Segoe UI', sans-serif";
+		}
+		ctx.fillStyle = "#ffffff";
+		ctx.fillText(textePoints, centreTexteX, positionPointsY);
 	}
 
 	// Fonction qui ajuste le canvas minuteur a la taille de l'ecran.
@@ -140,6 +162,17 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 	// Reagit aux changements de taille/orientation.
 	window.addEventListener("resize", redimensionnerCanvasMinuteur);
 	window.addEventListener("orientationchange", redimensionnerCanvasMinuteur);
+	// Met a jour le score affiche quand le gameplay notifie un changement.
+	window.addEventListener("points-mis-a-jour", function (event) {
+		if (!(event instanceof CustomEvent) || !event.detail) {
+			return;
+		}
+
+		if (typeof event.detail.points === "number") {
+			pointsAffiches = event.detail.points;
+			afficherMinuteur();
+		}
+	});
 	// Reagit au chargement de la pancarte.
 	imagePancarte.addEventListener("load", afficherMinuteur);
 	// Premier dessin.

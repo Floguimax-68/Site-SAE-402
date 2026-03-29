@@ -1,4 +1,4 @@
-html,
+/* Reset de base: supprime marges/paddings et bloque le scroll pour un jeu plein ecran */
 body {
 	margin: 0;
 	padding: 0;
@@ -6,17 +6,20 @@ body {
 	height: 100%;
 }
 
+/* Conteneur principal qui prend toute la largeur/hauteur de la fenetre */
 main {
 	width: 100vw;
 	height: 100dvh;
 }
 
-.canvas-stack {
+/* Zone de superposition des canvas (fond, timer, gameplay) */
+.pile-canvas {
 	position: relative;
 	width: 100vw;
 	height: 100dvh;
 }
 
+/* Canvas du fond */
 #canva-background {
 	position: absolute;
 	inset: 0;
@@ -25,6 +28,7 @@ main {
 	height: 100dvh;
 }
 
+/* Canvas du minuteur */
 #canva-timer {
 	position: absolute;
 	inset: 0;
@@ -35,6 +39,7 @@ main {
 	pointer-events: none;
 }
 
+/* Canvas des pommes */
 #canva-pommes {
 	position: absolute;
 	inset: 0;
@@ -45,6 +50,7 @@ main {
 	pointer-events: auto;
 }
 
+/* Overlay de fin de partie qui couvre tout l'ecran */
 .game-overlay {
 	position: absolute;
 	inset: 0;
@@ -56,10 +62,12 @@ main {
 	pointer-events: auto;
 }
 
+/* Etat visible de l'overlay. */
 .game-overlay.is-visible {
 	display: flex;
 }
 
+/* Carte centrale qui contient le message et le bouton de relance */
 .game-overlay-card {
 	background: rgba(255, 255, 255, 0.95);
 	padding: 22px 20px;
@@ -69,6 +77,7 @@ main {
 	min-width: 220px;
 }
 
+/* Titre de fin de partie dans la carte overlay. */
 .game-overlay-card h1 {
 	margin: 0 0 14px;
 	font-family: "Trebuchet MS", "Segoe UI", sans-serif;
@@ -77,6 +86,7 @@ main {
 	color: #b50000;
 }
 
+/* Bouton de redemarrage du jeu. */
 #restart-button {
 	border: none;
 	border-radius: 10px;
