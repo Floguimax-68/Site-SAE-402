@@ -60,7 +60,7 @@ if (canvasFond instanceof HTMLCanvasElement) {
 		const largeurVue = window.innerWidth;
 		// Hauteur visible a appliquer au canvas.
 		const hauteurVue = window.innerHeight;
-		// Ratio de pixels pour eviter un rendu flou sur ecrans haute densite.
+		// Ratio de pixels pour eviter un rendu flou sur ecrans haute densité.
 		const ratioPixels = window.devicePixelRatio || 1;
 
 		// Taille interne du canvas (en pixels reels).
