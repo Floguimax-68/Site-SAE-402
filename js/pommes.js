@@ -110,6 +110,16 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	const scoreVictoire = 125;
 	// Score courant du joueur.
 	let points = 0;
+	// Compteurs de pommes coupees, utilises pour l'easter egg.
+	let pommesDoreesCoupees = 0;
+	let pommesRougesCoupees = 0;
+	let pommesPourriesCoupees = 0;
+	// Verrou qui evite de declencher l'easter egg plusieurs fois.
+	let easterEggDoreDeclenche = false;
+	// Active un mode special ou seules des pommes dorees apparaissent.
+	let modeEasterEggDoreActif = false;
+	// Intervalle de pluie continue pendant l'easter egg.
+	let identifiantPluieDoree = null;
 
 	// Fonction qui envoie le score au canvas timer pour affichage sur la pancarte.
 	function mettreAJourAffichagePoints() {
@@ -209,7 +219,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	}
 
 	// Cree une nouvelle pomme avec physique initiale.
-	function apparaitrePomme() {
+	function apparaitrePomme(typeForce = null, jouerSonLancer = true) {
 		// Largeur disponible pour calculer la trajectoire de la pomme.
 		const largeurVue = canvasPommes.clientWidth;
 		// Hauteur disponible pour calculer la trajectoire de la pomme.
@@ -238,8 +248,8 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		const tempsVersApex = Math.abs(vitesseY) / accelerationY;
 		// Vitesse horizontale initiale pour rejoindre la cible X.
 		const vitesseX = ((cibleX - posX) / tempsVersApex) * 1.4;
-		// Type de pomme tire aleatoirement (rouge/jaune/verte).
-		const type = choisirTypePomme();
+		// Type de pomme tire aleatoirement (rouge/jaune/verte) ou impose.
+		const type = typeForce || choisirTypePomme();
 
 		// Ajoute la pomme dans le tableau.
 		pommesActives.push({
@@ -253,7 +263,9 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			hauteur: taillePomme,
 			type
 		});
-		jouerSon(sonThrowFruit);
+		if (jouerSonLancer) {
+			jouerSon(sonThrowFruit);
+		}
 	}
 
 	// Fait apparaitre 1 ou 2 pommes d'un coup.
@@ -274,6 +286,50 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		// Index de boucle pour creer le bon nombre de pommes.
 		for (let i = 0; i < nombre; i = i + 1) {
 			apparaitrePomme();
+		}
+	}
+
+	// Lance une pluie massive de pommes dorees pour l'easter egg.
+	function declencherEasterEggDore() {
+		if (easterEggDoreDeclenche || !jeuActif) {
+			return;
+		}
+
+		easterEggDoreDeclenche = true;
+		modeEasterEggDoreActif = true;
+
+		// Toutes les pommes deja presentes deviennent dorees.
+		for (let i = 0; i < pommesActives.length; i = i + 1) {
+			pommesActives[i].type = "jaune";
+		}
+
+		const pommesParSalve = 12;
+
+		if (identifiantPluieDoree !== null) {
+			clearInterval(identifiantPluieDoree);
+		}
+
+		identifiantPluieDoree = setInterval(function () {
+			if (!jeuActif) {
+				clearInterval(identifiantPluieDoree);
+				identifiantPluieDoree = null;
+				return;
+			}
+
+			for (let i = 0; i < pommesParSalve; i = i + 1) {
+				apparaitrePomme("jaune", false);
+			}
+		}, 500);
+	}
+
+	// Verifie si la condition speciale des 5 dorees uniquement est atteinte.
+	function verifierEasterEggDore() {
+		if (easterEggDoreDeclenche) {
+			return;
+		}
+
+		if (pommesDoreesCoupees === 5 && pommesRougesCoupees === 0 && pommesPourriesCoupees === 0) {
+			declencherEasterEggDore();
 		}
 	}
 
@@ -379,11 +435,13 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		}
 
 		// 3) Apparition des nouvelles pommes selon un delai aleatoire.
-		cumulApparitionMs = cumulApparitionMs + deltaTemps * 1000;
-		if (cumulApparitionMs >= prochainDelaiApparitionMs) {
-			apparaitreRafale();
-			cumulApparitionMs = 0;
-			prochainDelaiApparitionMs = aleatoireEntre(520, 1100);
+		if (!modeEasterEggDoreActif) {
+			cumulApparitionMs = cumulApparitionMs + deltaTemps * 1000;
+			if (cumulApparitionMs >= prochainDelaiApparitionMs) {
+				apparaitreRafale();
+				cumulApparitionMs = 0;
+				prochainDelaiApparitionMs = aleatoireEntre(520, 1100);
+			}
 		}
 	}
 
@@ -414,6 +472,11 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		if (identifiantAnimation !== null) {
 			cancelAnimationFrame(identifiantAnimation);
 			identifiantAnimation = null;
+		}
+
+		if (identifiantPluieDoree !== null) {
+			clearInterval(identifiantPluieDoree);
+			identifiantPluieDoree = null;
 		}
 
 		pommesActives.length = 0;
@@ -492,16 +555,20 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		// Fonction locale qui applique les points selon le type de pomme tranchee.
 		function ajouterPoints(typePomme) {
 			if (typePomme === "rouge") {
+				pommesRougesCoupees = pommesRougesCoupees + 1;
 				points = points + 2;
 				mettreAJourAffichagePoints();
 				jouerSon(sonPommeClassique);
+				return;
 			}
 
 			if (typePomme === "jaune") {
+				pommesDoreesCoupees = pommesDoreesCoupees + 1;
 				points = points + 10;
 				mettreAJourAffichagePoints();
 				jouerSon(sonPommeClassique);
 				jouerSon(sonComboDoree);
+				verifierEasterEggDore();
 			}
 		}
 
@@ -529,6 +596,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			if (estDansRectangle) {
 				// Pomme verte = fin de partie.
 				if (pomme.type === "verte") {
+					pommesPourriesCoupees = pommesPourriesCoupees + 1;
 					pommePourrieTouchee = true;
 					jouerSon(sonPommePourrie);
 				}
@@ -549,6 +617,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 				const ecartY = positionSourisY - plusProcheY;
 				if (ecartX * ecartX + ecartY * ecartY <= rayonContact * rayonContact) {
 					if (pomme.type === "verte") {
+						pommesPourriesCoupees = pommesPourriesCoupees + 1;
 						pommePourrieTouchee = true;
 						jouerSon(sonPommePourrie);
 					}
