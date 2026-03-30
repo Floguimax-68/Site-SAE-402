@@ -33,19 +33,36 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 
 	// Son joue quand une pomme rouge est tranchee.
 	const sonPommeClassique = new Audio("img/sfx/Impact-Plum.wav");
+	sonPommeClassique.volume = 0.5;
 	// Son bonus joue pour une pomme jaune.
 	const sonComboDoree = new Audio("img/sfx/combo-1.wav");
-	sonComboDoree.volume = 0.25;
+	sonComboDoree.volume = 0.125;
 	// Son joue quand une pomme pourrie est touchee.
 	const sonPommePourrie = new Audio("img/sfx/freesound_community-small-explosion-106769.mp3");
+	sonPommePourrie.volume = 0.5;
 	// Son de mort joue lors de la fin de partie.
 	const sonMort = new Audio("img/sfx/freesound_community-videogame-death-sound-43894.mp3");
+	// Le volume HTML est limite a 1, donc on ajoute +15% via un gain audio dedie.
+	const ClasseAudioContextEffets = window.AudioContext || window.webkitAudioContext;
+	let contexteAudioEffets = null;
+	if (ClasseAudioContextEffets) {
+		try {
+			contexteAudioEffets = new ClasseAudioContextEffets();
+			const sourceSonMort = contexteAudioEffets.createMediaElementSource(sonMort);
+			const gainSonMort = contexteAudioEffets.createGain();
+			gainSonMort.gain.value = 1.15;
+			sourceSonMort.connect(gainSonMort);
+			gainSonMort.connect(contexteAudioEffets.destination);
+		} catch (erreurAudio) {
+			contexteAudioEffets = null;
+		}
+	}
 	// Son d'impact joue sur collision avec bords ou autres pommes.
 	const sonImpact = new Audio("img/sfx/Impact.wav");
 	sonImpact.volume = 0.25;
 	// Son joue lors de l'apparition/lancement d'une pomme.
 	const sonThrowFruit = new Audio("img/sfx/Throw-fruit.wav");
-	sonThrowFruit.volume = 0.45;
+	sonThrowFruit.volume = 0.36;
 	// Tableau centralisant tous les sons du jeu pour les initialiser.
 	const sonsJeu = [sonPommeClassique, sonComboDoree, sonPommePourrie, sonMort, sonImpact, sonThrowFruit];
 	// Indique si les sons ont deja ete precharges.
@@ -68,6 +85,12 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 
 	// Fonction utilitaire qui rejoue un son depuis le debut.
 	function jouerSon(audio) {
+		if (audio === sonMort && contexteAudioEffets && contexteAudioEffets.state === "suspended") {
+			contexteAudioEffets.resume().catch(function () {
+				// Ignore si le navigateur bloque encore le contexte audio.
+			});
+		}
+
 		audio.currentTime = 0;
 		audio.play().catch(function () {
 			// Ignore les blocages navigateur si aucun geste utilisateur.
