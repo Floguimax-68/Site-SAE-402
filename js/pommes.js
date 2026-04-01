@@ -171,7 +171,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			return "jaune";
 		}
 
-		if (tirage < 36) {
+		if (tirage < 30) {
 			return "verte";
 		}
 
