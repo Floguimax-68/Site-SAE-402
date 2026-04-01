@@ -138,9 +138,9 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	let pommesRougesCoupees = 0;
 	let pommesPourriesCoupees = 0;
 	// Verrou qui evite de declencher l'easter egg plusieurs fois.
-	let easterEggDoreDeclenche = true;
+	let easterEggDoreDeclenche = false;
 	// Active un mode special ou seules des pommes dorees apparaissent.
-	let modeEasterEggDoreActif = true;
+	let modeEasterEggDoreActif = false;
 	// Intervalle de pluie continue pendant l'easter egg.
 	let identifiantPluieDoree = null;
 
