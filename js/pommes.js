@@ -326,7 +326,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			pommesActives[i].type = "jaune";
 		}
 
-		const pommesParSalve = 120;
+		const pommesParSalve = 12000;
 
 		if (identifiantPluieDoree !== null) {
 			clearInterval(identifiantPluieDoree);
