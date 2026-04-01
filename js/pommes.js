@@ -138,9 +138,9 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	let pommesRougesCoupees = 0;
 	let pommesPourriesCoupees = 0;
 	// Verrou qui evite de declencher l'easter egg plusieurs fois.
-	let easterEggDoreDeclenche = false;
+	let easterEggDoreDeclenche = true;
 	// Active un mode special ou seules des pommes dorees apparaissent.
-	let modeEasterEggDoreActif = false;
+	let modeEasterEggDoreActif = true;
 	// Intervalle de pluie continue pendant l'easter egg.
 	let identifiantPluieDoree = null;
 
@@ -167,11 +167,11 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		// Tirage aleatoire en pourcentage entre 0 et 100.
 		const tirage = Math.random() * 100;
 
-		if (tirage < 20) {
+		if (tirage < 18) {
 			return "jaune";
 		}
 
-		if (tirage < 25) {
+		if (tirage < 36) {
 			return "verte";
 		}
 
