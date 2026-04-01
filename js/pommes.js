@@ -167,7 +167,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		// Tirage aleatoire en pourcentage entre 0 et 100.
 		const tirage = Math.random() * 100;
 
-		if (tirage < 10) {
+		if (tirage < 20) {
 			return "jaune";
 		}
 
