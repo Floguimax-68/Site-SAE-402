@@ -7,6 +7,11 @@ if (canvasFond instanceof HTMLCanvasElement) {
 	// Objet image qui contient le visuel de fond du jeu.
 	const imageFond = new Image();
 	imageFond.src = "img/Fond-canva-fruit-ninja-pommes.webp";
+	// Images decoratives placees sur le mur du fond.
+	const imageBouclierMur = new Image();
+	imageBouclierMur.src = "img/bouclier-chevalier-teutonique.png";
+	const imageCasqueMur = new Image();
+	imageCasqueMur.src = "img/casque-chevalier-teutonique.png";
 
 	// Classe AudioContext compatible selon le navigateur.
 	const ClasseAudioContext = window.AudioContext || window.webkitAudioContext;
@@ -134,6 +139,8 @@ if (canvasFond instanceof HTMLCanvasElement) {
 		const sequenceAccents = sequenceAccentsA.concat(sequenceAccentsB, sequenceAccentsC, sequenceAccentsD);
 		// Position courante dans la sequence.
 		let indexNote = 0;
+		// Controle explicite de la lecture musicale.
+		let musiqueActive = false;
 
 		// Joue une note arcade avec une lead, un contre-chant et une basse.
 		function jouerNoteArcade(frequenceLead, frequenceContreChant, frequenceBasse, accent) {
@@ -215,8 +222,11 @@ if (canvasFond instanceof HTMLCanvasElement) {
 			}
 		}
 
-		// Tente de lancer/reprendre la musique (autoplay peut etre bloque avant geste utilisateur).
-		function tenterDemarrageMusique() {
+		// Demarre la musique depuis le debut apres clic sur un bouton overlay.
+		function demarrerMusiqueDepuisDebut() {
+			musiqueActive = true;
+			indexNote = 0;
+
 			if (contexteAudio.state === "suspended") {
 				contexteAudio.resume().catch(function () {
 					// Ignore si le navigateur bloque encore l'audio.
@@ -224,8 +234,23 @@ if (canvasFond instanceof HTMLCanvasElement) {
 			}
 		}
 
+		// Coupe la musique quand la page n'est plus visible.
+		function couperMusique() {
+			musiqueActive = false;
+
+			if (contexteAudio.state === "running") {
+				contexteAudio.suspend().catch(function () {
+					// Ignore les erreurs de suspension audio.
+				});
+			}
+		}
+
 		// Horloge musicale qui parcourt la sequence en boucle.
 		const identifiantIntervalleMusique = window.setInterval(function () {
+			if (!musiqueActive || document.hidden) {
+				return;
+			}
+
 			// Frequences de la boucle arcade sur le pas courant.
 			const frequenceLead = sequenceLead[indexNote];
 			const frequenceContreChant = sequenceContreChant[indexNote % sequenceContreChant.length];
@@ -235,20 +260,68 @@ if (canvasFond instanceof HTMLCanvasElement) {
 			indexNote = (indexNote + 1) % sequenceLead.length;
 		}, 140);
 
-		// Demarrage immediat au chargement.
-		tenterDemarrageMusique();
-		// Deblocage audio des le premier clic tactile/souris si necessaire.
-		window.addEventListener("pointerdown", tenterDemarrageMusique, { once: true });
-		// Deblocage audio aussi au premier appui clavier si necessaire.
-		window.addEventListener("keydown", tenterDemarrageMusique, { once: true });
+		// Relance la musique depuis le debut sur les boutons overlays.
+		const identifiantsBoutonsOverlay = ["start-button", "restart-button", "continue-button"];
+		for (let i = 0; i < identifiantsBoutonsOverlay.length; i = i + 1) {
+			const boutonOverlay = document.getElementById(identifiantsBoutonsOverlay[i]);
+			if (boutonOverlay instanceof HTMLButtonElement) {
+				boutonOverlay.addEventListener("click", demarrerMusiqueDepuisDebut);
+			}
+		}
+
+		// Coupe la musique si l'onglet/la fenetre n'est plus visible.
+		document.addEventListener("visibilitychange", function () {
+			if (document.hidden) {
+				couperMusique();
+			}
+		});
+
+		// Coupe la musique generee en JS au moment d'une victoire.
+		window.addEventListener("victoire-obtenue", couperMusique);
 
 		// Nettoie proprement l'intervalle si la page est quittee/rechargee.
 		window.addEventListener("beforeunload", function () {
+			couperMusique();
 			clearInterval(identifiantIntervalleMusique);
 		});
 	}
 
-	// Dessine l'image en mode plein ecran sans deformation.
+	function dessinerDecorationMurChevalier(largeurVue, hauteurVue) {
+		if (!ctx) {
+			return;
+		}
+
+		const largeurObjet = Math.max(64, Math.round(largeurVue * 0.115));
+		const hauteurObjet = largeurObjet;
+		const positionY = hauteurVue * 0.16;
+
+		ctx.save();
+		ctx.globalAlpha = 0.95;
+
+		// Place les PNG sur la partie haute du decor (mur du fond).
+		if (imageBouclierMur.complete && imageBouclierMur.naturalWidth > 0) {
+			ctx.drawImage(
+				imageBouclierMur,
+				largeurVue * 0.22 - largeurObjet / 2,
+				positionY,
+				largeurObjet,
+				hauteurObjet
+			);
+		}
+
+		if (imageCasqueMur.complete && imageCasqueMur.naturalWidth > 0) {
+			ctx.drawImage(
+				imageCasqueMur,
+				largeurVue * 0.78 - largeurObjet / 2,
+				positionY,
+				largeurObjet,
+				hauteurObjet
+			);
+		}
+
+		ctx.restore();
+	}
+
 	function dessinerFondPleinEcran() {
 		// Si le contexte ou l'image ne sont pas prets, on sort.
 		if (!ctx || !imageFond.complete || imageFond.naturalWidth === 0) {
@@ -292,6 +365,7 @@ if (canvasFond instanceof HTMLCanvasElement) {
 		// Nettoie puis dessine le fond.
 		ctx.clearRect(0, 0, largeurVue, hauteurVue);
 		ctx.drawImage(imageFond, decalageX, decalageY, largeurDessin, hauteurDessin);
+		dessinerDecorationMurChevalier(largeurVue, hauteurVue);
 	}
 
 	// Fonction qui redimensionne le canvas de fond a la taille de l'ecran.
@@ -324,6 +398,8 @@ if (canvasFond instanceof HTMLCanvasElement) {
 	window.addEventListener("orientationchange", redimensionnerCanvasFond);
 	// Dessine aussi des que l'image est chargee.
 	imageFond.addEventListener("load", redimensionnerCanvasFond);
+	imageBouclierMur.addEventListener("load", redimensionnerCanvasFond);
+	imageCasqueMur.addEventListener("load", redimensionnerCanvasFond);
 	// Premier affichage.
 	redimensionnerCanvasFond();
 }

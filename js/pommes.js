@@ -30,6 +30,9 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	imagesPommes.jaune.src = "img/apple_golden_60x60px.webp";
 	imagesPommes.verte.src = "img/apple_rotten_60x60px.webp";
 	imagesPommes.rouge.src = "img/apple_regular_60x60px.webp";
+	// SVG de tache affiche quand un fruit est coupe.
+	const imageTacheFruit = new Image();
+	imageTacheFruit.src = "img/Splash-fruit.svg";
 
 	// Son joue quand une pomme rouge est tranchee.
 	const sonPommeClassique = new Audio("img/sfx/Impact-Plum.wav");
@@ -42,6 +45,9 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	sonPommePourrie.volume = 0.5;
 	// Son de mort joue lors de la fin de partie.
 	const sonMort = new Audio("img/sfx/freesound_community-videogame-death-sound-43894.mp3");
+	// Son joue quand le joueur gagne la partie.
+	const sonVictoire = new Audio("img/sfx/winning.mp3");
+	sonVictoire.volume = 0.5;
 	// Le volume HTML est limite a 1, donc on ajoute +15% via un gain audio dedie.
 	const ClasseAudioContextEffets = window.AudioContext || window.webkitAudioContext;
 	let contexteAudioEffets = null;
@@ -64,7 +70,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	const sonThrowFruit = new Audio("img/sfx/Throw-fruit.wav");
 	sonThrowFruit.volume = 0.36;
 	// Tableau centralisant tous les sons du jeu pour les initialiser.
-	const sonsJeu = [sonPommeClassique, sonComboDoree, sonPommePourrie, sonMort, sonImpact, sonThrowFruit];
+	const sonsJeu = [sonPommeClassique, sonComboDoree, sonPommePourrie, sonMort, sonVictoire, sonImpact, sonThrowFruit];
 	// Indique si les sons ont deja ete precharges.
 	let sonsInitialises = false;
 
@@ -104,6 +110,12 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	let dernierTemps = 0;
 	// Tableau contenant toutes les pommes actuellement presentes.
 	const pommesActives = [];
+	// Tableau des taches visibles apres une coupe.
+	const tachesActives = [];
+	// Duree de disparition progressive d'une tache.
+	const dureeTacheMs = 3000;
+	// Opacite maximale volontairement reduite pour un rendu discret.
+	const opaciteInitialeTache = 0.68;
 	// Etat global indiquant si la partie est encore en cours.
 	let jeuActif = true;
 	// Temps cumule depuis la derniere vague d'apparition (en ms).
@@ -130,7 +142,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	// Verrou pour demarrer la boucle de jeu une seule fois.
 	let jeuDemarre = false;
 	// Score minimum a atteindre pour valider la victoire.
-	const scoreVictoire = 125;
+	const scoreVictoire = 250;
 	// Score courant du joueur.
 	let points = 0;
 	// Compteurs de pommes coupees, utilises pour l'easter egg.
@@ -210,6 +222,9 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 
 		ctx.clearRect(0, 0, largeurVue, hauteurVue);
 
+		// Dessine les taches en premier pour garder les fruits au-dessus.
+		dessinerTaches();
+
 		// Index pour parcourir toutes les pommes actives.
 		for (let i = 0; i < pommesActives.length; i = i + 1) {
 			// Pomme courante en cours de dessin.
@@ -237,6 +252,81 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			ctx.beginPath();
 			ctx.arc(zoneTactileX, zoneTactileY, rayonZoneTactile, 0, Math.PI * 2);
 			ctx.stroke();
+			ctx.restore();
+		}
+	}
+
+	// Retourne la couleur de tache selon le type de fruit coupe.
+	function obtenirCouleurTache(typePomme) {
+		if (typePomme === "jaune") {
+			return "#ffd400";
+		}
+
+		if (typePomme === "verte") {
+			return "#00b83f";
+		}
+
+		return "#ff1f1f";
+	}
+
+	// Cree une tache au point de coupe avec rotation aleatoire autour du centre.
+	function creerTacheFruit(typePomme, positionX, positionY, tailleFruit) {
+		tachesActives.push({
+			type: typePomme,
+			x: positionX,
+			y: positionY,
+			taille: tailleFruit * aleatoireEntre(1.7, 2.35),
+			angle: aleatoireEntre(0, Math.PI * 2),
+			instantCreation: performance.now()
+		});
+	}
+
+	// Affiche chaque tache avec un fade lineaire sur 1500 ms.
+	function dessinerTaches() {
+		if (!ctx) {
+			return;
+		}
+
+		const tempsActuel = performance.now();
+
+		for (let i = tachesActives.length - 1; i >= 0; i = i - 1) {
+			const tache = tachesActives[i];
+			const ageMs = tempsActuel - tache.instantCreation;
+			const progression = Math.min(ageMs / dureeTacheMs, 1);
+			const opacite = opaciteInitialeTache * (1 - progression);
+
+			if (progression >= 1 || opacite <= 0) {
+				tachesActives.splice(i, 1);
+				continue;
+			}
+
+			const largeurTache = tache.taille;
+			const hauteurTache = tache.taille;
+
+			ctx.save();
+			ctx.translate(tache.x, tache.y);
+			ctx.rotate(tache.angle);
+			ctx.globalAlpha = opacite;
+
+			if (imageTacheFruit.complete && imageTacheFruit.naturalWidth > 0) {
+				ctx.drawImage(
+					imageTacheFruit,
+					-largeurTache / 2,
+					-hauteurTache / 2,
+					largeurTache,
+					hauteurTache
+				);
+				ctx.globalCompositeOperation = "source-atop";
+				ctx.fillStyle = obtenirCouleurTache(tache.type);
+				ctx.fillRect(-largeurTache / 2, -hauteurTache / 2, largeurTache, hauteurTache);
+				ctx.globalCompositeOperation = "source-over";
+			} else {
+				ctx.fillStyle = obtenirCouleurTache(tache.type);
+				ctx.beginPath();
+				ctx.arc(0, 0, largeurTache * 0.35, 0, Math.PI * 2);
+				ctx.fill();
+			}
+
 			ctx.restore();
 		}
 	}
@@ -326,7 +416,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			pommesActives[i].type = "jaune";
 		}
 
-		const pommesParSalve = 12000;
+		const pommesParSalve = 20;
 
 		if (identifiantPluieDoree !== null) {
 			clearInterval(identifiantPluieDoree);
@@ -471,6 +561,12 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	// Boucle d'animation (appelee a chaque frame).
 	function animer(tempsActuel) {
 		if (!jeuActif) {
+			if (tachesActives.length > 0) {
+				dessinerMonde();
+				identifiantAnimation = window.requestAnimationFrame(animer);
+			} else {
+				identifiantAnimation = null;
+			}
 			return;
 		}
 
@@ -504,6 +600,10 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 
 		pommesActives.length = 0;
 		dessinerMonde();
+
+		if (tachesActives.length > 0) {
+			identifiantAnimation = window.requestAnimationFrame(animer);
+		}
 	}
 
 	// Affiche l'overlay GAME OVER avec un message adapte a la cause.
@@ -521,7 +621,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			if (causeDefaite === "pomme-pourrie") {
 				messageFinPartie.textContent = "Aïe, vous avez coupé une pomme pourrie.";
 			} else {
-				messageFinPartie.textContent = "Vous avez marqué moins de 125 points.";
+				messageFinPartie.textContent = "Vous avez marqué moins de 250 points.";
 			}
 		}
 
@@ -537,11 +637,13 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		}
 
 		finPartieDeclenchee = true;
+		window.dispatchEvent(new Event("victoire-obtenue"));
+		jouerSon(sonVictoire);
 		arreterJeu();
 		window.dispatchEvent(new Event("fin-de-partie"));
 
 		if (messageVictoire instanceof HTMLElement) {
-			messageVictoire.textContent = "Bravo, vous avez marqué " + points + " points.";
+			messageVictoire.textContent = "Bravo, vous avez gagné un repas offert par le créteur du jeu a la taverne du chevelu ce soir a 20h30";
 		}
 
 		if (overlayVictoire instanceof HTMLElement) {
@@ -617,6 +719,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 				positionSourisY <= bas;
 
 			if (estDansRectangle) {
+				creerTacheFruit(pomme.type, pomme.posX, pomme.posY, pomme.largeur);
 				// Pomme verte = fin de partie.
 				if (pomme.type === "verte") {
 					pommesPourriesCoupees = pommesPourriesCoupees + 1;
@@ -639,6 +742,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 				// Ecart vertical entre le centre du contact et ce point proche.
 				const ecartY = positionSourisY - plusProcheY;
 				if (ecartX * ecartX + ecartY * ecartY <= rayonContact * rayonContact) {
+					creerTacheFruit(pomme.type, pomme.posX, pomme.posY, pomme.largeur);
 					if (pomme.type === "verte") {
 						pommesPourriesCoupees = pommesPourriesCoupees + 1;
 						pommePourrieTouchee = true;
