@@ -45,7 +45,7 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 		sonsChronoInitialises = true;
 	}
 	// Valeur du compte a rebours en secondes.
-	let tempsRestant = 60;
+	let tempsRestant = 30;
 	// Score courant a afficher sur la pancarte du timer.
 	let pointsAffiches = 0;
 	// Reduction legere de la taille visuelle du timer (en px).
