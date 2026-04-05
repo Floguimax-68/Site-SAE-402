@@ -142,7 +142,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	// Verrou pour demarrer la boucle de jeu une seule fois.
 	let jeuDemarre = false;
 	// Score minimum a atteindre pour valider la victoire.
-	const scoreVictoire = 250;
+	const scoreVictoire = 80;
 	// Score courant du joueur.
 	let points = 0;
 	// Compteurs de pommes coupees, utilises pour l'easter egg.
@@ -621,7 +621,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			if (causeDefaite === "pomme-pourrie") {
 				messageFinPartie.textContent = "Aïe, vous avez coupé une pomme pourrie.";
 			} else {
-				messageFinPartie.textContent = "Vous avez marqué moins de 250 points.";
+				messageFinPartie.textContent = "Vous avez marqué moins de 80 points.";
 			}
 		}
 
