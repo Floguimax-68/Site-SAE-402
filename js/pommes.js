@@ -142,7 +142,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	// Verrou pour demarrer la boucle de jeu une seule fois.
 	let jeuDemarre = false;
 	// Score minimum a atteindre pour valider la victoire.
-	const scoreVictoire = 80;
+	const scoreVictoire = 250;
 	// Score courant du joueur.
 	let points = 0;
 	// Compteurs de pommes coupees, utilises pour l'easter egg.
@@ -621,7 +621,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 			if (causeDefaite === "pomme-pourrie") {
 				messageFinPartie.textContent = "Aïe, vous avez coupé une pomme pourrie.";
 			} else {
-				messageFinPartie.textContent = "Vous avez marqué moins de 80 points.";
+				messageFinPartie.textContent = "Vous avez marqué moins de 250 points.";
 			}
 		}
 
@@ -643,7 +643,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		window.dispatchEvent(new Event("fin-de-partie"));
 
 		if (messageVictoire instanceof HTMLElement) {
-			messageVictoire.textContent = "Bravo, vous avez gagné un repas offert par le créateur du jeu, ce soir à 20h30 à la Taverne du Chevelu.";
+			messageVictoire.textContent = "Bravo, vous avez marqué " + points + " points.";
 		}
 
 		if (overlayVictoire instanceof HTMLElement) {
