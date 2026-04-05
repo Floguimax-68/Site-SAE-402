@@ -643,7 +643,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		window.dispatchEvent(new Event("fin-de-partie"));
 
 		if (messageVictoire instanceof HTMLElement) {
-			messageVictoire.textContent = "Bravo, vous avez gagné un repas offert par le créteur du jeu a la taverne du chevelu ce soir a 20h30";
+			messageVictoire.textContent = "Bravo, vous avez gagné un repas offert par le créateur du jeu, ce soir à 20h30 à la Taverne du Chevelu.";
 		}
 
 		if (overlayVictoire instanceof HTMLElement) {
