@@ -1,5 +1,6 @@
 // Verrouille le lancement du jeu tant que la cible GPS n'est pas atteinte.
 (function () {
+    const cleValidationGps = "site-sae-402-gps-valide";
     const cible = {
         latitude: 47.729134,
         longitude: 7.301284
@@ -22,6 +23,22 @@
     let cercleCible = null;
     let ligneDirection = null;
     let jeuDebloque = false;
+
+    function marquerValidationGps() {
+        try {
+            window.sessionStorage.setItem(cleValidationGps, "1");
+        } catch (erreurStockage) {
+            // Ignore si le navigateur bloque le stockage de session.
+        }
+    }
+
+    function gpsDejaValide() {
+        try {
+            return window.sessionStorage.getItem(cleValidationGps) === "1";
+        } catch (erreurStockage) {
+            return false;
+        }
+    }
 
     function mettreMessage(texte) {
         if (messageGps instanceof HTMLElement) {
@@ -86,6 +103,7 @@
         }
 
         jeuDebloque = true;
+        marquerValidationGps();
         if (identifiantWatch !== null) {
             navigator.geolocation.clearWatch(identifiantWatch);
             identifiantWatch = null;
@@ -134,6 +152,18 @@
 
     function demarrerSuiviGps() {
         if (!(overlayGps instanceof HTMLElement)) {
+            return;
+        }
+
+        if (gpsDejaValide()) {
+            if (overlayGps instanceof HTMLElement) {
+                overlayGps.classList.remove("est-visible");
+            }
+            if (overlayRegles instanceof HTMLElement) {
+                overlayRegles.classList.remove("est-visible");
+            }
+
+            window.dispatchEvent(new Event("jeu-demarre"));
             return;
         }
 

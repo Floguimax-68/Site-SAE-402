@@ -269,6 +269,8 @@ if (canvasFond instanceof HTMLCanvasElement) {
 			}
 		}
 
+		window.addEventListener("jeu-demarre", demarrerMusiqueDepuisDebut);
+
 		// Coupe la musique si l'onglet/la fenetre n'est plus visible.
 		document.addEventListener("visibilitychange", function () {
 			if (document.hidden) {
