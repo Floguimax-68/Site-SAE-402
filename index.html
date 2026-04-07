@@ -5,47 +5,57 @@
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<title>Site SAE 402</title>
 	<link rel="icon" type="image/webp" href="img/apple_regular_60x60px.webp">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 	<link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
 	<main>
-		<div class="pile-canvas">
-			<canvas id="canva-background"></canvas>
-			<canvas id="canva-timer"></canvas>
-			<canvas id="canva-pommes"></canvas>
+		<div class="pile-toiles">
+			<canvas id="toile-fond"></canvas>
+			<canvas id="toile-minuteur"></canvas>
+			<canvas id="toile-pommes"></canvas>
 		</div>
-		<div id="rules-overlay" class="game-overlay is-visible">
-			<div class="game-overlay-card">
+		<div id="surcouche-gps" class="surcouche-jeu est-visible">
+			<div class="carte-surcouche-jeu carte-surcouche-gps">
+				<h1>MISSION GPS</h1>
+				<p id="message-gps" class="message-surcouche">Autorisez la geolocalisation puis rejoignez le point cible pour lancer la partie.</p>
+				<div id="map"></div>
+			</div>
+		</div>
+		<div id="surcouche-regles" class="surcouche-jeu">
+			<div class="carte-surcouche-jeu">
 				<h1>REGLES DU JEU</h1>
-				<ul class="rules-list">
+				<ul class="liste-regles">
 					<li>Ne pas couper les pommes pourries.</li>
 					<li>Faire minimum 250 points.</li>
 					<li>Pomme rouge = 2 points.</li>
 					<li>Pommes dorées = 10 points.</li>
 					<li>Il y as un secret caché pour les plus malins.</li>
 				</ul>
-				<p class="overlay-message">Bonne chance !</p>
-				<button id="start-button" type="button">GO !</button>
+				<p class="message-surcouche">Bonne chance !</p>
+				<button id="bouton-demarrer" type="button">GO !</button>
 			</div>
 		</div>
-		<div id="game-over-overlay" class="game-overlay">
-			<div class="game-overlay-card">
+		<div id="surcouche-fin-partie" class="surcouche-jeu">
+			<div class="carte-surcouche-jeu">
 				<h1>GAME OVER</h1>
-				<p id="game-over-message" class="overlay-message">Vous avez marqué 0 points.</p>
-				<button id="restart-button" type="button">Recommencer</button>
+				<p id="message-fin-partie" class="message-surcouche">Vous avez marqué 0 points.</p>
+				<button id="bouton-recommencer" type="button">Recommencer</button>
 			</div>
 		</div>
-		<div id="win-overlay" class="game-overlay">
-			<div class="game-overlay-card game-overlay-card-win">
+		<div id="surcouche-victoire" class="surcouche-jeu">
+			<div class="carte-surcouche-jeu carte-surcouche-jeu-victoire">
 				<h1>VICTOIRE</h1>
-				<p id="win-message" class="overlay-message">Bravo, vous avez marqué 0 points.</p>
-				<button id="continue-button" type="button">Continuer</button>
+				<p id="message-victoire" class="message-surcouche">Bravo, vous avez marqué 0 points.</p>
+				<button id="bouton-continuer" type="button">Continuer</button>
 			</div>
 		</div>
 	</main>
 
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 	<script src="js/script.js?v=20260405"></script>
 	<script src="js/timer.js?v=20260405"></script>
 	<script src="js/pommes.js?v=20260405"></script>
+	<script src="js/gps.js?v=20260405"></script>
 </body>
 </html>

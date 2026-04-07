@@ -1,5 +1,5 @@
 // Element canvas dedie a l'affichage du chronometre.
-const canvasMinuteur = document.getElementById("canva-timer");
+const canvasMinuteur = document.getElementById("toile-minuteur");
 
 if (canvasMinuteur instanceof HTMLCanvasElement) {
 	// Contexte 2D utilise pour dessiner le minuteur.

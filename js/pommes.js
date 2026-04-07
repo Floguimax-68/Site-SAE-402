@@ -1,25 +1,25 @@
 // Element canvas principal utilise pour le gameplay des pommes.
-const canvasPommes = document.getElementById("canva-pommes");
+const canvasPommes = document.getElementById("toile-pommes");
 
 if (canvasPommes instanceof HTMLCanvasElement) {
 	// Contexte 2D qui permet de dessiner les pommes et effets.
 	const ctx = canvasPommes.getContext("2d");
 	// Element overlay affiche quand la partie est perdue.
-	const overlayFinPartie = document.getElementById("game-over-overlay");
+	const overlayFinPartie = document.getElementById("surcouche-fin-partie");
 	// Element overlay affiche quand le joueur gagne.
-	const overlayVictoire = document.getElementById("win-overlay");
+	const overlayVictoire = document.getElementById("surcouche-victoire");
 	// Element overlay affiche les regles avant le debut de partie.
-	const overlayRegles = document.getElementById("rules-overlay");
+	const overlayRegles = document.getElementById("surcouche-regles");
 	// Bouton qui relance une partie apres game over.
-	const boutonRecommencer = document.getElementById("restart-button");
+	const boutonRecommencer = document.getElementById("bouton-recommencer");
 	// Bouton pour continuer apres victoire (relance le jeu pour l'instant).
-	const boutonContinuer = document.getElementById("continue-button");
+	const boutonContinuer = document.getElementById("bouton-continuer");
 	// Bouton qui lance la partie depuis l'overlay des regles.
-	const boutonDemarrer = document.getElementById("start-button");
+	const boutonDemarrer = document.getElementById("bouton-demarrer");
 	// Texte dynamique qui affiche le score final dans l'overlay victoire.
-	const messageVictoire = document.getElementById("win-message");
+	const messageVictoire = document.getElementById("message-victoire");
 	// Texte dynamique qui affiche le score final dans l'overlay game over.
-	const messageFinPartie = document.getElementById("game-over-message");
+	const messageFinPartie = document.getElementById("message-fin-partie");
 	// Dictionnaire des images associees a chaque type de pomme.
 	const imagesPommes = {
 		jaune: new Image(),
@@ -281,7 +281,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		});
 	}
 
-	// Affiche chaque tache avec un fade lineaire sur 1500 ms.
+	// Affiche chaque tache avec un fade lineaire sur 3000 ms.
 	function dessinerTaches() {
 		if (!ctx) {
 			return;
@@ -626,7 +626,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		}
 
 		if (overlayFinPartie instanceof HTMLElement) {
-			overlayFinPartie.classList.add("is-visible");
+			overlayFinPartie.classList.add("est-visible");
 		}
 	}
 
@@ -647,7 +647,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		}
 
 		if (overlayVictoire instanceof HTMLElement) {
-			overlayVictoire.classList.add("is-visible");
+			overlayVictoire.classList.add("est-visible");
 		}
 	}
 
@@ -854,7 +854,7 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 	if (boutonDemarrer instanceof HTMLButtonElement) {
 		boutonDemarrer.addEventListener("click", function () {
 			if (overlayRegles instanceof HTMLElement) {
-				overlayRegles.classList.remove("is-visible");
+				overlayRegles.classList.remove("est-visible");
 			}
 
 			window.dispatchEvent(new Event("jeu-demarre"));

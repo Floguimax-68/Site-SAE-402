@@ -1,5 +1,5 @@
 // Element canvas utilise pour afficher le decor de fond.
-const canvasFond = document.getElementById("canva-background");
+const canvasFond = document.getElementById("toile-fond");
 
 if (canvasFond instanceof HTMLCanvasElement) {
 	// Contexte 2D qui permet de dessiner sur le canvas du fond.
@@ -261,7 +261,7 @@ if (canvasFond instanceof HTMLCanvasElement) {
 		}, 140);
 
 		// Relance la musique depuis le debut sur les boutons overlays.
-		const identifiantsBoutonsOverlay = ["start-button", "restart-button", "continue-button"];
+		const identifiantsBoutonsOverlay = ["bouton-demarrer", "bouton-recommencer", "bouton-continuer"];
 		for (let i = 0; i < identifiantsBoutonsOverlay.length; i = i + 1) {
 			const boutonOverlay = document.getElementById(identifiantsBoutonsOverlay[i]);
 			if (boutonOverlay instanceof HTMLButtonElement) {
@@ -286,6 +286,7 @@ if (canvasFond instanceof HTMLCanvasElement) {
 		});
 	}
 
+	// Dessine les decorations PNG du theme chevalier sur le mur du fond.
 	function dessinerDecorationMurChevalier(largeurVue, hauteurVue) {
 		if (!ctx) {
 			return;

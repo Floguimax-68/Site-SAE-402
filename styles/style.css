@@ -13,14 +13,14 @@ main {
 }
 
 /* Zone de superposition des canvas (fond, timer, gameplay) */
-.pile-canvas {
+.pile-toiles {
 	position: relative;
 	width: 100vw;
 	height: 100dvh;
 }
 
 /* Canvas du fond */
-#canva-background {
+#toile-fond {
 	position: absolute;
 	inset: 0;
 	display: block;
@@ -29,7 +29,7 @@ main {
 }
 
 /* Canvas du minuteur */
-#canva-timer {
+#toile-minuteur {
 	position: absolute;
 	inset: 0;
 	display: block;
@@ -40,7 +40,7 @@ main {
 }
 
 /* Canvas des pommes */
-#canva-pommes {
+#toile-pommes {
 	position: absolute;
 	inset: 0;
 	display: block;
@@ -51,7 +51,7 @@ main {
 }
 
 /* Overlay de fin de partie qui couvre tout l'ecran */
-.game-overlay {
+.surcouche-jeu {
 	position: absolute;
 	inset: 0;
 	display: none;
@@ -63,12 +63,12 @@ main {
 }
 
 /* Etat visible de l'overlay. */
-.game-overlay.is-visible {
+.surcouche-jeu.est-visible {
 	display: flex;
 }
 
 /* Carte centrale qui contient le message et le bouton de relance */
-.game-overlay-card {
+.carte-surcouche-jeu {
 	background: rgba(255, 255, 255, 0.95);
 	padding: 22px 20px;
 	border-radius: 14px;
@@ -77,8 +77,21 @@ main {
 	min-width: 220px;
 }
 
+.carte-surcouche-gps {
+	width: min(92vw, 760px);
+	padding: 18px;
+}
+
+#map {
+	height: min(58vh, 440px);
+	width: 100%;
+	border-radius: 10px;
+	overflow: hidden;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
 /* Titre de fin de partie dans la carte overlay. */
-.game-overlay-card h1 {
+.carte-surcouche-jeu h1 {
 	margin: 0 0 14px;
 	font-family: "Trebuchet MS", "Segoe UI", sans-serif;
 	font-size: clamp(26px, 7vw, 38px);
@@ -87,12 +100,12 @@ main {
 }
 
 /* Variante de couleur pour le titre de la carte de victoire. */
-.game-overlay-card-win h1 {
+.carte-surcouche-jeu-victoire h1 {
 	color: #1f8f2f;
 }
 
 /* Texte de score affiche dans les overlays de fin de partie/victoire. */
-.overlay-message {
+.message-surcouche {
 	margin: 0 0 14px;
 	font-family: "Trebuchet MS", "Segoe UI", sans-serif;
 	font-size: clamp(16px, 3.8vw, 22px);
@@ -101,7 +114,7 @@ main {
 }
 
 /* Liste des regles dans l'overlay de demarrage. */
-.rules-list {
+.liste-regles {
 	margin: 0 0 14px;
 	padding-left: 24px;
 	text-align: left;
@@ -112,14 +125,14 @@ main {
 }
 
 /* Espacement entre les points de la liste des regles. */
-.rules-list li {
+.liste-regles li {
 	margin-bottom: 6px;
 }
 
 /* Bouton de redemarrage du jeu. */
-#restart-button,
-#continue-button,
-#start-button {
+#bouton-recommencer,
+#bouton-continuer,
+#bouton-demarrer {
 	border: none;
 	border-radius: 10px;
 	padding: 10px 16px;
@@ -129,3 +142,9 @@ main {
 	background: #1f8f2f;
 	color: #ffffff;
 }
+
+/* Masque le deuxieme span de cet en-tete specifique. */
+.masteriyo-single-body__main--curriculum-content-bottom__accordion--header-misc > span:nth-of-type(2) {
+	display: none;
+}
+
