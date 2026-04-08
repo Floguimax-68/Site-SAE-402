@@ -1,20 +1,20 @@
 // Element canvas dedie a l'affichage du chronometre.
-const canvasMinuteur = document.getElementById("toile-minuteur");
+const canvasMinuteur = document.getElementById("canva-minuteur");
 
 if (canvasMinuteur instanceof HTMLCanvasElement) {
 	// Contexte 2D utilise pour dessiner le minuteur.
 	const ctx = canvasMinuteur.getContext("2d");
 	// Objet image contenant la pancarte visuelle du chrono.
 	const imagePancarte = new Image();
-	imagePancarte.src = "img/pancarte-canva-chrono.webp";
+	imagePancarte.src = "src/img/pancarte-canva-chrono.webp";
 	// Son joue sur un battement du tic-tac.
-	const sonTick = new Audio("img/sfx/Time-tick.wav");
+	const sonTick = new Audio("src/songs/Time-tick.wav");
 	// Son joue sur l'autre battement du tic-tac.
-	const sonTock = new Audio("img/sfx/Time-tock.wav");
+	const sonTock = new Audio("src/songs/Time-tock.wav");
 	// Son d'alerte dans les dernieres secondes.
-	const sonBeep = new Audio("img/sfx/time-beep.wav");
+	const sonBeep = new Audio("src/songs/time-beep.wav");
 	// Son final joue quand le temps est ecoule.
-	const sonTimeUp = new Audio("img/sfx/time-up.wav");
+	const sonTimeUp = new Audio("src/songs/time-up.wav");
 	// Tableau regroupant tous les sons du chrono pour les precharger.
 	const sonsChrono = [sonTick, sonTock, sonBeep, sonTimeUp];
 	// Indique si les sons du chrono ont deja ete initialises.
@@ -176,8 +176,10 @@ if (canvasMinuteur instanceof HTMLCanvasElement) {
 		}
 	});
 	// Reagit au chargement de la pancarte.
-	imagePancarte.addEventListener("load", afficherMinuteur);
+	imagePancarte.addEventListener("load", redimensionnerCanvasMinuteur);
 	window.addEventListener("pointerdown", initialiserSonsChrono, { once: true });
+	// Premier dimensionnement pour eviter tout etirement avant le clic sur GO.
+	redimensionnerCanvasMinuteur();
 
 	// Demarre le minuteur uniquement au lancement explicite du jeu.
 	function demarrerMinuteur() {

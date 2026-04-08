@@ -1,17 +1,15 @@
 // Element canvas utilise pour afficher le decor de fond.
-const canvasFond = document.getElementById("toile-fond");
+const canvasFond = document.getElementById("canva-fond");
 
 if (canvasFond instanceof HTMLCanvasElement) {
 	// Contexte 2D qui permet de dessiner sur le canvas du fond.
 	const ctx = canvasFond.getContext("2d");
 	// Objet image qui contient le visuel de fond du jeu.
 	const imageFond = new Image();
-	imageFond.src = "img/Fond-canva-fruit-ninja-pommes.webp";
+	imageFond.src = "src/img/Fond-canva-fruit-ninja-pommes.webp";
 	// Images decoratives placees sur le mur du fond.
 	const imageBouclierMur = new Image();
-	imageBouclierMur.src = "img/bouclier-chevalier-teutonique.png";
-	const imageCasqueMur = new Image();
-	imageCasqueMur.src = "img/casque-chevalier-teutonique.png";
+	imageBouclierMur.src = "src/img/bouclier-eppee.png";
 
 	// Classe AudioContext compatible selon le navigateur.
 	const ClasseAudioContext = window.AudioContext || window.webkitAudioContext;
@@ -269,8 +267,6 @@ if (canvasFond instanceof HTMLCanvasElement) {
 			}
 		}
 
-		window.addEventListener("jeu-demarre", demarrerMusiqueDepuisDebut);
-
 		// Coupe la musique si l'onglet/la fenetre n'est plus visible.
 		document.addEventListener("visibilitychange", function () {
 			if (document.hidden) {
@@ -294,28 +290,22 @@ if (canvasFond instanceof HTMLCanvasElement) {
 			return;
 		}
 
-		const largeurObjet = Math.max(64, Math.round(largeurVue * 0.115));
-		const hauteurObjet = largeurObjet;
-		const positionY = hauteurVue * 0.16;
+		const largeurObjet = Math.max(360, Math.round(largeurVue * 0.54));
+		const ratioObjet =
+			imageBouclierMur.complete && imageBouclierMur.naturalHeight > 0
+				? imageBouclierMur.naturalWidth / imageBouclierMur.naturalHeight
+				: 1;
+		const hauteurObjet = largeurObjet / ratioObjet;
+		const positionY = hauteurVue * 0.26;
 
 		ctx.save();
 		ctx.globalAlpha = 0.95;
 
-		// Place les PNG sur la partie haute du decor (mur du fond).
+		// Place le bouclier au centre du mur du fond.
 		if (imageBouclierMur.complete && imageBouclierMur.naturalWidth > 0) {
 			ctx.drawImage(
 				imageBouclierMur,
-				largeurVue * 0.22 - largeurObjet / 2,
-				positionY,
-				largeurObjet,
-				hauteurObjet
-			);
-		}
-
-		if (imageCasqueMur.complete && imageCasqueMur.naturalWidth > 0) {
-			ctx.drawImage(
-				imageCasqueMur,
-				largeurVue * 0.78 - largeurObjet / 2,
+				largeurVue * 0.5 - largeurObjet / 2,
 				positionY,
 				largeurObjet,
 				hauteurObjet
@@ -402,7 +392,6 @@ if (canvasFond instanceof HTMLCanvasElement) {
 	// Dessine aussi des que l'image est chargee.
 	imageFond.addEventListener("load", redimensionnerCanvasFond);
 	imageBouclierMur.addEventListener("load", redimensionnerCanvasFond);
-	imageCasqueMur.addEventListener("load", redimensionnerCanvasFond);
 	// Premier affichage.
 	redimensionnerCanvasFond();
 }

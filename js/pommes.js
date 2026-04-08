@@ -1,5 +1,5 @@
 // Element canvas principal utilise pour le gameplay des pommes.
-const canvasPommes = document.getElementById("toile-pommes");
+const canvasPommes = document.getElementById("canva-pommes");
 
 if (canvasPommes instanceof HTMLCanvasElement) {
 	// Contexte 2D qui permet de dessiner les pommes et effets.
@@ -27,26 +27,26 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		rouge: new Image()
 	};
 	// Chemins des images.
-	imagesPommes.jaune.src = "img/apple_golden_60x60px.webp";
-	imagesPommes.verte.src = "img/apple_rotten_60x60px.webp";
-	imagesPommes.rouge.src = "img/apple_regular_60x60px.webp";
+	imagesPommes.jaune.src = "src/img/apple_golden_60x60px.webp";
+	imagesPommes.verte.src = "src/img/apple_rotten_60x60px.webp";
+	imagesPommes.rouge.src = "src/img/apple_regular_60x60px.webp";
 	// SVG de tache affiche quand un fruit est coupe.
 	const imageTacheFruit = new Image();
-	imageTacheFruit.src = "img/Splash-fruit.svg";
+	imageTacheFruit.src = "src/img/Splash-fruit.svg";
 
 	// Son joue quand une pomme rouge est tranchee.
-	const sonPommeClassique = new Audio("img/sfx/Impact-Plum.wav");
+	const sonPommeClassique = new Audio("src/songs/Impact-Plum.wav");
 	sonPommeClassique.volume = 0.5;
 	// Son bonus joue pour une pomme jaune.
-	const sonComboDoree = new Audio("img/sfx/combo-1.wav");
+	const sonComboDoree = new Audio("src/songs/combo-1.wav");
 	sonComboDoree.volume = 0.125;
 	// Son joue quand une pomme pourrie est touchee.
-	const sonPommePourrie = new Audio("img/sfx/freesound_community-small-explosion-106769.mp3");
+	const sonPommePourrie = new Audio("src/songs/freesound_community-small-explosion-106769.mp3");
 	sonPommePourrie.volume = 0.5;
 	// Son de mort joue lors de la fin de partie.
-	const sonMort = new Audio("img/sfx/freesound_community-videogame-death-sound-43894.mp3");
+	const sonMort = new Audio("src/songs/freesound_community-videogame-death-sound-43894.mp3");
 	// Son joue quand le joueur gagne la partie.
-	const sonVictoire = new Audio("img/sfx/winning.mp3");
+	const sonVictoire = new Audio("src/songs/winning.mp3");
 	sonVictoire.volume = 0.5;
 	// Le volume HTML est limite a 1, donc on ajoute +15% via un gain audio dedie.
 	const ClasseAudioContextEffets = window.AudioContext || window.webkitAudioContext;
@@ -64,10 +64,10 @@ if (canvasPommes instanceof HTMLCanvasElement) {
 		}
 	}
 	// Son d'impact joue sur collision avec bords ou autres pommes.
-	const sonImpact = new Audio("img/sfx/Impact.wav");
+	const sonImpact = new Audio("src/songs/Impact.wav");
 	sonImpact.volume = 0.25;
 	// Son joue lors de l'apparition/lancement d'une pomme.
-	const sonThrowFruit = new Audio("img/sfx/Throw-fruit.wav");
+	const sonThrowFruit = new Audio("src/songs/Throw-fruit.wav");
 	sonThrowFruit.volume = 0.36;
 	// Tableau centralisant tous les sons du jeu pour les initialiser.
 	const sonsJeu = [sonPommeClassique, sonComboDoree, sonPommePourrie, sonMort, sonVictoire, sonImpact, sonThrowFruit];

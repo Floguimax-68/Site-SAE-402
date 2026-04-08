@@ -4,25 +4,17 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<title>Site SAE 402</title>
-	<link rel="icon" type="image/webp" href="img/apple_regular_60x60px.webp">
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+	<link rel="icon" type="image/webp" href="src/img/apple_regular_60x60px.webp">
 	<link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
 	<main>
-		<div class="pile-toiles">
-			<canvas id="toile-fond"></canvas>
-			<canvas id="toile-minuteur"></canvas>
-			<canvas id="toile-pommes"></canvas>
+		<div class="pile-canvas">
+			<canvas id="canva-fond"></canvas>
+			<canvas id="canva-minuteur"></canvas>
+			<canvas id="canva-pommes"></canvas>
 		</div>
-		<div id="surcouche-gps" class="surcouche-jeu est-visible">
-			<div class="carte-surcouche-jeu carte-surcouche-gps">
-				<h1>MISSION GPS</h1>
-				<p id="message-gps" class="message-surcouche">Autorisez la geolocalisation puis rejoignez le point cible pour lancer la partie.</p>
-				<div id="map"></div>
-			</div>
-		</div>
-		<div id="surcouche-regles" class="surcouche-jeu">
+		<div id="surcouche-regles" class="surcouche-jeu est-visible">
 			<div class="carte-surcouche-jeu">
 				<h1>REGLES DU JEU</h1>
 				<ul class="liste-regles">
@@ -52,7 +44,6 @@
 		</div>
 	</main>
 
-	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 	<script src="js/script.js?v=20260405"></script>
 	<script src="js/timer.js?v=20260405"></script>
 	<script src="js/pommes.js?v=20260405"></script>
